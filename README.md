@@ -1,2 +1,2 @@
 # cvlabs
-Computer vision programming assignments
+Лабораторные работы по курсу "Компьютерное зрение".
