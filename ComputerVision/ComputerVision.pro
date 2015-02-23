@@ -1,22 +1,7 @@
-#-------------------------------------------------
-#
-# Project created by QtCreator 2015-02-21T14:48:37
-#
-#-------------------------------------------------
+TEMPLATE = subdirs
 
-QT       -= gui
+SUBDIRS += \
+    Core \
+    Lab1-Filters
 
-TARGET = ComputerVision
-TEMPLATE = lib
-
-DEFINES += COMPUTERVISION_LIBRARY
-
-SOURCES += image.cpp
-
-HEADERS += image.h\
-        computervision_global.h
-
-unix {
-    target.path = /usr/lib
-    INSTALLS += target
-}
+Lab1-Filters.depends = Core
