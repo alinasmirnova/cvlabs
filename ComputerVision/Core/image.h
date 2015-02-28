@@ -1,21 +1,17 @@
 #ifndef IMAGE_H
 #define IMAGE_H
-#include <QImage>
-#include <QColor>
-#include <QDebug>
+#include <memory>
+using namespace std;
 
 class Image
 {
-    short **image;
-    int width;
-    int height;
-    Image(int w, int h);
 public:
+    Image(int h, int w);
 
-    static Image* GetFromFile(const char* fileName);
-    static Image* GetFromQImage(QImage* qImage);
-
-    QImage* toQImage();
+private:
+    unique_ptr<int[]> image;
+    int height;
+    int weight;
 };
 
 #endif // IMAGE_H
