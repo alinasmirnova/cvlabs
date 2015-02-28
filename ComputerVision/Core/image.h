@@ -2,14 +2,14 @@
 #define IMAGE_H
 #include <memory>
 #include <QImage>
-#include <QDebug>
+#include <QtDebug>
 using namespace std;
 
 class Image
 {
+public:
     Image(int h, int w);
 
-public:
     static shared_ptr<Image> fromFile(const char* fileName);
     static shared_ptr<Image> fromQImage(QImage picture);
 
@@ -21,7 +21,7 @@ public:
 private:
     unique_ptr<int[]> image;
     int height;
-    int weight;
+    int width;
 };
 
 #endif // IMAGE_H

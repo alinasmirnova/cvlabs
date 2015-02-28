@@ -5,7 +5,7 @@ Image::Image(int h, int w)
 {
     image = unique_ptr<int[]>(new int[h*w]);
     height = h;
-    weight = w;
+    width = w;
 }
 
 shared_ptr<Image> Image::fromFile(const char* fileName)
@@ -26,7 +26,7 @@ shared_ptr<Image> Image::fromFile(const char* fileName)
 
 shared_ptr<Image> Image::fromQImage(QImage picture)
 {
-    shared_ptr<Image> result = make_shared<Image>(picture.height(), picture.width()());
+    shared_ptr<Image> result = make_shared<Image>(picture.height(), picture.width());
     QRgb original;
     int color;
 
@@ -45,13 +45,13 @@ shared_ptr<Image> Image::fromQImage(QImage picture)
     return result;
 }
 
-QImage toQImage()
+QImage Image::toQImage()
 {
     QImage result = QImage(width, height, QImage::Format_RGB32);
     int color;
     for(int i=0; i<height; i++)
     {
-        for(int j=0; j<weight; j++)
+        for(int j=0; j<width; j++)
         {
             color = getPixel(i, j);
             result.setPixel(j, i, qRgb(color,color,color));
@@ -60,22 +60,22 @@ QImage toQImage()
     return result;
 }
 
-int getPixel(int i, int j)
+int Image::getPixel(int i, int j)
 {
-    if(i<height && j<weight && i>0 && j>0)
+    if(i<height && j<width && i>0 && j>0)
     {
-        return image[i*weight + j];
+        return image[i*width + j];
     }
     else
     {
-        qFatal() << "Index out of the range: [" << i << "][" << j << "]";
+        qFatal("getPixel: index out of the range");
         return -1;
     }
 }
 
-int setPixel(int i, int j, int value)
+int Image::setPixel(int i, int j, int value)
 {
-    if(i<height && j<weight && i>0 && j>0)
+    if(i<height && j<width && i>0 && j>0)
     {
         if(value < 0)
         {
@@ -86,12 +86,12 @@ int setPixel(int i, int j, int value)
             value = 255;
         }
 
-        image[i*weight + j] = value;
+        image[i*width + j] = value;
         return value;
     }
     else
     {
-        qFatal() << "Index out of the range: [" << i << "][" << j << "]";
+        qFatal("setPixel: index out of the range");
         return -1;
     }
 }
