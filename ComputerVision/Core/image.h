@@ -10,7 +10,7 @@ class Image
 public:
     Image(int h, int w);
 
-    static shared_ptr<Image> fromFile(const char* fileName);
+    static shared_ptr<Image> fromFile(const QString &fileName);
     static shared_ptr<Image> fromQImage(QImage picture);
 
     QImage toQImage();

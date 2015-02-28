@@ -8,7 +8,7 @@ Image::Image(int h, int w)
     width = w;
 }
 
-shared_ptr<Image> Image::fromFile(const char* fileName)
+shared_ptr<Image> Image::fromFile(const QString& fileName)
 {
     QImage picture;
     bool isLoaded = picture.load(fileName);
@@ -62,7 +62,7 @@ QImage Image::toQImage()
 
 int Image::getPixel(int i, int j)
 {
-    if(i<height && j<width && i>0 && j>0)
+    if(i<height && j<width && i>=0 && j>=0)
     {
         return image[i*width + j];
     }
@@ -75,7 +75,7 @@ int Image::getPixel(int i, int j)
 
 int Image::setPixel(int i, int j, int value)
 {
-    if(i<height && j<width && i>0 && j>0)
+    if(i<height && j<width && i>=0 && j>=0)
     {
         if(value < 0)
         {

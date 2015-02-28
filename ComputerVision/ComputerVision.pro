@@ -1,4 +1,6 @@
 TEMPLATE = subdirs
 
 SUBDIRS += \
-    Core
+    Core \
+    Labs
+Labs.depends = Core
