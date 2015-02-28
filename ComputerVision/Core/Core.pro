@@ -10,9 +10,15 @@ CONFIG += staticlib
 CONFIG += c++11
 QMAKE_CXXFLAGS += -std=c++11
 
-SOURCES += image.cpp
+SOURCES += image.cpp \
+    filtermanager.cpp \
+    maskfactory.cpp \
+    mask.cpp
 
-HEADERS += image.h
+HEADERS += image.h \
+    filtermanager.h \
+    maskfactory.h \
+    mask.h
 unix {
     target.path = /usr/lib
     INSTALLS += target
