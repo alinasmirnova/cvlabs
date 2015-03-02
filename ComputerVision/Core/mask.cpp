@@ -2,15 +2,15 @@
 
 Mask::Mask(int s)
 {
-    size = s;
-    core = unique_ptr<int[]>(new int[s*s]);
+    this->s = s;
+    core = unique_ptr<float[]>(new float[s*s]);
 }
 
-int Mask::getPixel(int i, int j)
+float Mask::getPixel(int i, int j)
 {
-    if(i<size && j<size && i>=0 && j>=0)
+    if(i<size() && j<size() && i>=0 && j>=0)
     {
-        return core[i*size + j];
+        return core[i*size() + j];
     }
     else
     {
@@ -19,11 +19,11 @@ int Mask::getPixel(int i, int j)
     }
 }
 
-int Mask::setPixel(int i, int j, int value)
+float Mask::setPixel(int i, int j, float value)
 {
-    if(i<size && j<size && i>=0 && j>=0)
+    if(i<size() && j<size() && i>=0 && j>=0)
     {
-        core[i*size + j] = value;
+        core[i*size() + j] = value;
         return value;
     }
     else
@@ -35,7 +35,7 @@ int Mask::setPixel(int i, int j, int value)
 
 int Mask::size()
 {
-    return size;
+    return s;
 }
 
 Mask::~Mask()

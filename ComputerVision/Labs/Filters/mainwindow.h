@@ -4,7 +4,9 @@
 #include <QMainWindow>
 #include <QFileDialog>
 #include <memory>
-#include "Image.h"
+#include "image.h"
+#include "filtermanager.h"
+#include "maskfactory.h"
 
 namespace Ui {
 class MainWindow;

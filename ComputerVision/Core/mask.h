@@ -1,14 +1,22 @@
 #ifndef MASK_H
 #define MASK_H
 #include <memory>
+#include <QtGlobal>
 using namespace std;
 
 class Mask
-{
-    unique_ptr<int[]> core;
+{    
 public:
-    Mask(int size);
+    Mask(int s);
+
+    float getPixel(int i, int j);
+    float setPixel(int i, int j, float value);
+
+    int size();
     ~Mask();
+private:
+    unique_ptr<float[]> core;
+    int s;
 };
 
 #endif // MASK_H

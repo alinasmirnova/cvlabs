@@ -14,9 +14,13 @@ public:
     static shared_ptr<Image> fromQImage(QImage picture);
 
     QImage toQImage();
+    void normalize(int min, int max, int bottom = INT_MAX, int top = INT_MIN);
 
     int getPixel(int i, int j);
     int setPixel(int i, int j, int value);
+
+    int getHeight();
+    int getWidth();
 
 private:
     unique_ptr<int[]> image;

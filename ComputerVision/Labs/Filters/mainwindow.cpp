@@ -23,10 +23,8 @@ void MainWindow::openFile()
         if(fileNames.length() > 0)
         {
             QWidget::setWindowTitle(fileNames[0]);
-            originalImage = Image::fromFile(fileNames[0]);
-            resultImage = Image::fromFile(fileNames[0]);
+            resultImage = FilterManager::Filter(Image::fromFile(fileNames[0]), MaskFactory::Sobel(Asix::X));
 
-            ui->original->setPixmap(QPixmap::fromImage(originalImage->toQImage()));
             ui->result->setPixmap(QPixmap::fromImage(resultImage->toQImage()));
         }
     }

@@ -77,15 +77,6 @@ int Image::setPixel(int i, int j, int value)
 {
     if(i<height && j<width && i>=0 && j>=0)
     {
-        if(value < 0)
-        {
-            value = 0;
-        }
-        else if(value > 255)
-        {
-            value = 255;
-        }
-
         image[i*width + j] = value;
         return value;
     }
@@ -94,4 +85,42 @@ int Image::setPixel(int i, int j, int value)
         qFatal("setPixel: index out of the range");
         return -1;
     }
+}
+
+ void Image::normalize(int min, int max, int bottom, int top)
+ {
+     if(bottom == INT_MAX || top == INT_MIN)
+     {
+         for(int i=0; i<height; i++)
+         {
+             for(int j=0; j<width; j++)
+             {
+                 if(image[i*width+j] < bottom)
+                 {
+                     bottom = image[i*width+j];
+                 }
+                 else if(image[i*width+j] > top)
+                 {
+                     top = image[i*width+j];
+                 }
+             }
+         }
+     }
+     for(int i=0; i<height; i++)
+     {
+         for(int j=0; j<width; j++)
+         {
+            image[i*width+j] = min + (max - min)*(image[i*width+j] - bottom)/(top - bottom);
+         }
+     }
+ }
+
+int Image::getHeight()
+{
+    return height;
+}
+
+int Image::getWidth()
+{
+    return width;
 }
