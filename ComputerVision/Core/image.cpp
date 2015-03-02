@@ -68,8 +68,7 @@ int Image::getPixel(int i, int j)
     }
     else
     {
-        qFatal("getPixel: index out of the range");
-        return -1;
+        return 0;
     }
 }
 

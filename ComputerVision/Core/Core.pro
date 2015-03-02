@@ -13,12 +13,14 @@ QMAKE_CXXFLAGS += -std=c++11
 SOURCES += image.cpp \
     filtermanager.cpp \
     maskfactory.cpp \
-    mask.cpp
+    mask.cpp \
+    separatedmask.cpp
 
 HEADERS += image.h \
     filtermanager.h \
     maskfactory.h \
-    mask.h
+    mask.h \
+    separatedmask.h
 unix {
     target.path = /usr/lib
     INSTALLS += target
