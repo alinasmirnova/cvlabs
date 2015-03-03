@@ -20,7 +20,8 @@ HEADERS += image.h \
     filtermanager.h \
     maskfactory.h \
     mask.h \
-    separatedmask.h
+    separatedmask.h \
+    core.h
 unix {
     target.path = /usr/lib
     INSTALLS += target

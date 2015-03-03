@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>726</width>
-    <height>479</height>
+    <width>791</width>
+    <height>534</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -26,57 +26,235 @@
      <verstretch>0</verstretch>
     </sizepolicy>
    </property>
-   <widget class="QWidget" name="horizontalLayoutWidget">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>10</y>
-      <width>701</width>
-      <height>441</height>
-     </rect>
-    </property>
-    <layout class="QHBoxLayout" name="horizontalLayout">
-     <item>
-      <widget class="QLabel" name="result">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
+   <layout class="QHBoxLayout" name="horizontalLayout_2">
+    <item>
+     <widget class="QScrollArea" name="scrollArea">
+      <property name="widgetResizable">
+       <bool>true</bool>
+      </property>
+      <widget class="QWidget" name="scrollAreaWidgetContents">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>0</y>
+         <width>771</width>
+         <height>493</height>
+        </rect>
        </property>
-       <property name="text">
-        <string/>
-       </property>
+       <layout class="QHBoxLayout" name="horizontalLayout">
+        <item>
+         <widget class="QLabel" name="result">
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </widget>
-     </item>
-    </layout>
-   </widget>
-   <zorder>result</zorder>
-   <zorder>horizontalLayoutWidget</zorder>
+     </widget>
+    </item>
+   </layout>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>726</width>
+     <width>791</width>
      <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu">
     <property name="title">
-     <string>File</string>
+     <string>Файл</string>
     </property>
     <addaction name="openFile"/>
    </widget>
+   <widget class="QMenu" name="filter">
+    <property name="title">
+     <string>Фильтр</string>
+    </property>
+    <widget class="QMenu" name="shift">
+     <property name="title">
+      <string>Сдвиг</string>
+     </property>
+     <addaction name="shiftLeft"/>
+     <addaction name="shiftRight"/>
+     <addaction name="shiftTop"/>
+     <addaction name="shiftBottom"/>
+    </widget>
+    <widget class="QMenu" name="gaussMenu">
+     <property name="title">
+      <string>Гаусс</string>
+     </property>
+     <addaction name="gauss"/>
+     <addaction name="gaussSep"/>
+    </widget>
+    <addaction name="shift"/>
+    <addaction name="blur"/>
+    <addaction name="gaussMenu"/>
+   </widget>
+   <widget class="QMenu" name="operators">
+    <property name="title">
+     <string>Оператор</string>
+    </property>
+    <widget class="QMenu" name="sobelMenu">
+     <property name="title">
+      <string>Собель</string>
+     </property>
+     <addaction name="sobel"/>
+     <addaction name="sobelSep"/>
+    </widget>
+    <addaction name="sobelMenu"/>
+   </widget>
+   <widget class="QMenu" name="derivatives">
+    <property name="title">
+     <string>Частные производные</string>
+    </property>
+    <widget class="QMenu" name="sobelDerMenu">
+     <property name="title">
+      <string>Собель</string>
+     </property>
+     <addaction name="sobelX"/>
+     <addaction name="sobelY"/>
+     <addaction name="separator"/>
+     <addaction name="sobelXSep"/>
+     <addaction name="sobelYSep"/>
+    </widget>
+    <widget class="QMenu" name="pruitMenu">
+     <property name="title">
+      <string>Прюитт</string>
+     </property>
+     <addaction name="pruitX"/>
+     <addaction name="pruitY"/>
+    </widget>
+    <widget class="QMenu" name="sharrMenu">
+     <property name="title">
+      <string>Щарр</string>
+     </property>
+     <addaction name="sharrX"/>
+     <addaction name="sharrY"/>
+    </widget>
+    <addaction name="sobelDerMenu"/>
+    <addaction name="pruitMenu"/>
+    <addaction name="sharrMenu"/>
+   </widget>
    <addaction name="menu"/>
+   <addaction name="filter"/>
+   <addaction name="operators"/>
+   <addaction name="derivatives"/>
   </widget>
   <action name="openFile">
    <property name="text">
-    <string>Open</string>
+    <string>Открыть</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+O</string>
+   </property>
+  </action>
+  <action name="sobel">
+   <property name="text">
+    <string>Обычный</string>
+   </property>
+  </action>
+  <action name="sobelSep">
+   <property name="text">
+    <string>Сепарабельный</string>
+   </property>
+  </action>
+  <action name="shiftLeft">
+   <property name="text">
+    <string>Влево</string>
+   </property>
+  </action>
+  <action name="shiftRight">
+   <property name="text">
+    <string>Вправо</string>
+   </property>
+  </action>
+  <action name="shiftTop">
+   <property name="text">
+    <string>Вверх</string>
+   </property>
+  </action>
+  <action name="shiftBottom">
+   <property name="text">
+    <string>Вниз</string>
+   </property>
+  </action>
+  <action name="blur">
+   <property name="text">
+    <string>Размытие</string>
+   </property>
+  </action>
+  <action name="sobelX">
+   <property name="text">
+    <string>X</string>
+   </property>
+  </action>
+  <action name="sobelY">
+   <property name="text">
+    <string>Y</string>
+   </property>
+  </action>
+  <action name="sobelXSep">
+   <property name="text">
+    <string>X(сепарабельная)</string>
+   </property>
+  </action>
+  <action name="sobelYSep">
+   <property name="text">
+    <string>Y(сепарабельная)</string>
+   </property>
+  </action>
+  <action name="pruitX">
+   <property name="text">
+    <string>X</string>
+   </property>
+  </action>
+  <action name="pruitY">
+   <property name="text">
+    <string>Y</string>
+   </property>
+  </action>
+  <action name="pruitXSep">
+   <property name="text">
+    <string>X(сепарабельная)</string>
+   </property>
+  </action>
+  <action name="pruitYSep">
+   <property name="text">
+    <string>Y(сепарабельная)</string>
+   </property>
+  </action>
+  <action name="sharrX">
+   <property name="text">
+    <string>X</string>
+   </property>
+  </action>
+  <action name="sharrY">
+   <property name="text">
+    <string>Y</string>
+   </property>
+  </action>
+  <action name="sharrXSep">
+   <property name="text">
+    <string>X(сепарабельная)</string>
+   </property>
+  </action>
+  <action name="sharrYSep">
+   <property name="text">
+    <string>Y(сепарабельная)</string>
+   </property>
+  </action>
+  <action name="gauss">
+   <property name="text">
+    <string>Обычный</string>
+   </property>
+  </action>
+  <action name="gaussSep">
+   <property name="text">
+    <string>Сепарабельный</string>
    </property>
   </action>
  </widget>

@@ -60,7 +60,7 @@ QImage Image::toQImage()
     return result;
 }
 
-int Image::getPixel(int i, int j)
+int Image::getPixel(int i, int j, EdgeMode mode)
 {
     if(i<height && j<width && i>=0 && j>=0)
     {
@@ -68,8 +68,20 @@ int Image::getPixel(int i, int j)
     }
     else
     {
-        return 0;
+        switch(mode)
+        {
+            case EdgeMode::ZEROS: return 0;
+            case EdgeMode::COPY:
+                 return image[min(max(i,0), 255)*width + min(max(j,0), 255)];
+            case EdgeMode::MIRROR:
+                if(i<0) i = i*(-1);
+                if(j<0) j = j*(-1);
+                if(i>height) i = height - (i%height);
+                if(j>width) j = width - (j%width);
+                return image[i*width + j];
+        }
     }
+    return 0;
 }
 
 int Image::setPixel(int i, int j, int value)

@@ -5,6 +5,13 @@
 #include <QtDebug>
 using namespace std;
 
+enum EdgeMode
+{
+    ZEROS = 1,
+    MIRROR = 2,
+    COPY = 3
+};
+
 class Image
 {
 public:
@@ -16,7 +23,7 @@ public:
     QImage toQImage();
     void normalize(int min, int max, int bottom = INT_MAX, int top = INT_MIN);
 
-    int getPixel(int i, int j);
+    int getPixel(int i, int j, EdgeMode mode=EdgeMode::ZEROS);
     int setPixel(int i, int j, int value);
 
     int getHeight();
