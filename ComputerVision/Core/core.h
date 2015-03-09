@@ -5,5 +5,5 @@
 #include "filtermanager.h"
 #include "maskfactory.h"
 #include "separatedmask.h"
-#endif // CORE
+#endif
 

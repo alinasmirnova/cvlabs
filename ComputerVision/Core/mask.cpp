@@ -1,16 +1,17 @@
 #include "mask.h"
 
-Mask::Mask(int s)
+Mask::Mask(int h, int w)
 {
-    this->s = s;
-    core = unique_ptr<float[]>(new float[s*s]);
+    this->height = h;
+    this->width = w;
+    core = make_unique<float[]>(h*w);
 }
 
 float Mask::getPixel(int i, int j)
 {
-    if(i<size() && j<size() && i>=0 && j>=0)
+    if(i<height && j<width && i>=0 && j>=0)
     {
-        return core[i*size() + j];
+        return core[i*width + j];
     }
     else
     {
@@ -21,9 +22,9 @@ float Mask::getPixel(int i, int j)
 
 float Mask::setPixel(int i, int j, float value)
 {
-    if(i<size() && j<size() && i>=0 && j>=0)
+    if(i<height && j<width && i>=0 && j>=0)
     {
-        core[i*size() + j] = value;
+        core[i*width + j] = value;
         return value;
     }
     else
@@ -33,9 +34,13 @@ float Mask::setPixel(int i, int j, float value)
     }
 }
 
-int Mask::size()
+int Mask::getHeight()
 {
-    return s;
+    return height;
+}
+int Mask::getWidth()
+{
+    return width;
 }
 
 Mask::~Mask()
