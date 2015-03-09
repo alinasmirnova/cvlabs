@@ -49,91 +49,91 @@ void MainWindow::openFile()
 
 void MainWindow::leftShift()
 {
-    image = FilterManager::Filter(image, MaskFactory::Shift(10,Direction::LEFT));
+    image = FilterManager::Filter(*image, *MaskFactory::Shift(10,Direction::LEFT));
     ui->result->setPixmap(QPixmap::fromImage(image->toQImage()));
 }
 
 void MainWindow::rightShift()
 {
-    image = FilterManager::Filter(image, MaskFactory::Shift(10,Direction::RIGHT));
+    image = FilterManager::Filter(*image, *MaskFactory::Shift(10,Direction::RIGHT));
     ui->result->setPixmap(QPixmap::fromImage(image->toQImage()));
 }
 void MainWindow::topShift()
 {
-    image = FilterManager::Filter(image, MaskFactory::Shift(10,Direction::UP));
+    image = FilterManager::Filter(*image, *MaskFactory::Shift(10,Direction::UP));
     ui->result->setPixmap(QPixmap::fromImage(image->toQImage()));
 }
 void MainWindow::bottomShift()
 {
-    image = FilterManager::Filter(image, MaskFactory::Shift(10,Direction::DOWN));
+    image = FilterManager::Filter(*image, *MaskFactory::Shift(10,Direction::DOWN));
     ui->result->setPixmap(QPixmap::fromImage(image->toQImage()));
 }
 void MainWindow::blur()
 {
-    image = FilterManager::Filter(image, MaskFactory::Blur(4,9));
+    image = FilterManager::Filter(*image, *MaskFactory::Blur(4,9));
     ui->result->setPixmap(QPixmap::fromImage(image->toQImage()));
 }
 void MainWindow::sobelX()
 {
-    image = FilterManager::Filter(image, MaskFactory::Sobel(Asix::X));
+    image = FilterManager::Filter(*image, *MaskFactory::Sobel(Asix::X));
     ui->result->setPixmap(QPixmap::fromImage(image->toQImage()));
 }
 void MainWindow::sobelY()
 {
-    image = FilterManager::Filter(image, MaskFactory::Sobel(Asix::Y));
+    image = FilterManager::Filter(*image, *MaskFactory::Sobel(Asix::Y));
     ui->result->setPixmap(QPixmap::fromImage(image->toQImage()));
 }
 void MainWindow::pruitX()
 {
-    image = FilterManager::Filter(image, MaskFactory::Pruit(Asix::X));
+    image = FilterManager::Filter(*image, *MaskFactory::Pruit(Asix::X));
     ui->result->setPixmap(QPixmap::fromImage(image->toQImage()));
 }
 void MainWindow::pruitY()
 {
-    image = FilterManager::Filter(image, MaskFactory::Pruit(Asix::Y));
+    image = FilterManager::Filter(*image, *MaskFactory::Pruit(Asix::Y));
     ui->result->setPixmap(QPixmap::fromImage(image->toQImage()));
 }
 void MainWindow::sharrX()
 {
-    image = FilterManager::Filter(image, MaskFactory::Shar(Asix::X));
+    image = FilterManager::Filter(*image, *MaskFactory::Shar(Asix::X));
     ui->result->setPixmap(QPixmap::fromImage(image->toQImage()));
 }
 void MainWindow::sharrY()
 {
-    image = FilterManager::Filter(image, MaskFactory::Shar(Asix::Y));
+    image = FilterManager::Filter(*image, *MaskFactory::Shar(Asix::Y));
     ui->result->setPixmap(QPixmap::fromImage(image->toQImage()));
 }
 
 void MainWindow::sobel()
 {
-    image = FilterManager::SobelOperator(image);
+    image = FilterManager::SobelOperator(*image);
     ui->result->setPixmap(QPixmap::fromImage(image->toQImage()));
 }
 void MainWindow::sobelSepX()
 {
-    image = FilterManager::SeparatedFilter(image, MaskFactory::SobelSeparated(Asix::X));
+    image = FilterManager::SeparatedFilter(*image, *MaskFactory::SobelSeparated(Asix::X));
     ui->result->setPixmap(QPixmap::fromImage(image->toQImage()));
 }
 
 void MainWindow::sobelSepY()
 {
-    image = FilterManager::SeparatedFilter(image, MaskFactory::SobelSeparated(Asix::Y));
+    image = FilterManager::SeparatedFilter(*image, *MaskFactory::SobelSeparated(Asix::Y));
     ui->result->setPixmap(QPixmap::fromImage(image->toQImage()));
 }
 void MainWindow::sobelSep()
 {
-    image = FilterManager::SobelOperatorSeparated(image);
+    image = FilterManager::SobelOperatorSeparated(*image);
     ui->result->setPixmap(QPixmap::fromImage(image->toQImage()));
 }
 void MainWindow::gauss()
 {
-    image = FilterManager::Filter(image, MaskFactory::Gauss(5,6));
+    image = FilterManager::Filter(*image, *MaskFactory::Gauss(5), true);
     ui->result->setPixmap(QPixmap::fromImage(image->toQImage()));
 }
 
 void MainWindow::gaussSep()
 {
-    image = FilterManager::SeparatedFilter(image, MaskFactory::GaussSeparated(5,6));
+    image = FilterManager::SeparatedFilter(*image, *MaskFactory::GaussSeparated(5), true);
     ui->result->setPixmap(QPixmap::fromImage(image->toQImage()));
 }
 

@@ -1,13 +1,15 @@
 #include "filtermanager.h"
 
-shared_ptr<Image> FilterManager::Filter(shared_ptr<Image> source, shared_ptr<Mask> mask, bool norm)
+shared_ptr<Image> FilterManager::Filter(const Image &source, const Mask &mask, bool norm, EdgeMode edgeMode)
 {
-    shared_ptr<Image> result = make_shared<Image>(source->getHeight(), source->getWidth());
+    shared_ptr<Image> result = make_shared<Image>(source.getHeight(), source.getWidth());
 
-    int k = (mask->size() - 1) / 2;
-    float pixel;
-    int max = INT_MIN, min = INT_MAX;
-    int round;
+    double pixel;
+    int heighHalf = (mask.getHeight() - 1)/2;
+    int widthHalf = (mask.getWidth() - 1)/2;
+
+    double max = numeric_limits<double>::min(), min = numeric_limits<double>::max() ;
+
 
     for(int i=0; i<result->getHeight(); i++)
     {
@@ -15,22 +17,21 @@ shared_ptr<Image> FilterManager::Filter(shared_ptr<Image> source, shared_ptr<Mas
         {
             pixel = 0;
 
-            for(int u = 0; u<mask->size(); u++)
+            for(int u = 0; u<mask.getHeight(); u++)
             {
-                for(int v = 0; v<mask->size(); v++)
+                for(int v = 0; v<mask.getWidth(); v++)
                 {
-                   pixel = pixel + mask->getPixel(u,v) * source->getPixel(i-(u-k), j-(v-k));
+                   pixel = pixel + mask.getPixel(u,v) * source.getPixel(i-(u-heighHalf), j-(v-widthHalf), edgeMode);
                 }
             }
-            round = qRound(pixel);
-            result->setPixel(i, j, round);
-            if(round > max)
+            result->setPixel(i, j, pixel);
+            if(pixel > max)
             {
-                max = round;
+                max = pixel;
             }
-            if(round < min)
+            if(pixel < min)
             {
-                min = round;
+                min = pixel;
             }
         }
     }
@@ -38,91 +39,77 @@ shared_ptr<Image> FilterManager::Filter(shared_ptr<Image> source, shared_ptr<Mas
     return result;
 }
 
-shared_ptr<Image> FilterManager::SobelOperator(shared_ptr<Image> source)
+shared_ptr<Image> FilterManager::SobelOperator(const Image &source, EdgeMode edgeMode)
 {
-    shared_ptr<Image> gradX = FilterManager::Filter(source, MaskFactory::Sobel(Asix::X), false);
-    shared_ptr<Image> gradY = FilterManager::Filter(source, MaskFactory::Sobel(Asix::Y), false);
+    shared_ptr<Image> gradX = FilterManager::Filter(source, *(MaskFactory::Sobel(Asix::X)), false, edgeMode);
+    shared_ptr<Image> gradY = FilterManager::Filter(source, *(MaskFactory::Sobel(Asix::Y)), false, edgeMode);
 
-    shared_ptr<Image> result = make_shared<Image>(source->getHeight(), source->getWidth());
+    shared_ptr<Image> result = make_shared<Image>(source.getHeight(), source.getWidth());
 
-    int gX, gY;
+    double gX, gY;
+    double max = numeric_limits<double>::min(), min = numeric_limits<double>::max();
+    double pixel;
+
     for(int i=0; i<result->getHeight(); i++)
     {
         for(int j=0; j<result->getWidth(); j++)
         {
             gX = gradX->getPixel(i,j);
             gY = gradY->getPixel(i,j);
-            result->setPixel(i,j, qRound(sqrt(gX*gX + gY*gY)));
+            pixel = sqrt(gX*gX + gY*gY);
+            result->setPixel(i,j, pixel);
+            if(pixel > max)
+            {
+                max = pixel;
+            }
+            if(pixel < min)
+            {
+                min = pixel;
+            }
         }
     }
-    result->normalize(0, 255);
+    result->normalize(0, 255, min, max);
     return result;
 }
 
-shared_ptr<Image> FilterManager::SeparatedFilter(shared_ptr<Image> source, shared_ptr<SeparatedMask> mask, bool norm)
+shared_ptr<Image> FilterManager::SeparatedFilter(const Image &source, const SeparatedMask &mask, bool norm, EdgeMode edgeMode)
 {
-    shared_ptr<Image> rResult = make_shared<Image>(source->getHeight(), source->getWidth());
-    shared_ptr<Image> cResult = make_shared<Image>(source->getHeight(), source->getWidth());
-    float pixel;
-    int round;
-    int k = (mask->size() - 1) / 2;
+    shared_ptr<Image> rResult = FilterManager::Filter(source, *(mask.getRow()), false, edgeMode);
+    shared_ptr<Image> cResult = FilterManager::Filter(*rResult, *(mask.getColumn()), false, edgeMode);
 
-    for(int i=0; i<rResult->getHeight(); i++)
-    {
-        for(int j=0; j<rResult->getWidth(); j++)
-        {
-            pixel = 0;
-            for(int u = 0; u<mask->size(); u++)
-            {
-                pixel = pixel + mask->getRowPixel(u) * source->getPixel(i, j-(u-k));
-            }
-            rResult->setPixel(i, j, qRound(pixel));
-        }
-    }
-
-    int max = INT_MIN, min = INT_MAX;
-    for(int i=0; i<cResult->getHeight(); i++)
-    {
-        for(int j=0; j<cResult->getWidth(); j++)
-        {
-            pixel = 0;
-            for(int u = 0; u<mask->size(); u++)
-            {
-                pixel = pixel + mask->getColPixel(u) * rResult->getPixel(i-(u-k), j);
-            }
-            round = qRound(pixel);
-            cResult->setPixel(i, j, round);
-            if(round > max)
-            {
-                max = round;
-            }
-            if(round < min)
-            {
-                min = round;
-            }
-        }
-    }
-    if(norm) cResult->normalize(0,255,min,max);
+    if(norm) cResult->normalize(0,255);
     return cResult;
 }
 
-shared_ptr<Image> FilterManager::SobelOperatorSeparated(shared_ptr<Image> source)
+shared_ptr<Image> FilterManager::SobelOperatorSeparated(const Image &source, EdgeMode edgeMode)
 {
-    shared_ptr<Image> gradX = FilterManager::SeparatedFilter(source, MaskFactory::SobelSeparated(Asix::X), false);
-    shared_ptr<Image> gradY = FilterManager::SeparatedFilter(source, MaskFactory::SobelSeparated(Asix::Y), false);
+    shared_ptr<Image> gradX = FilterManager::SeparatedFilter(source, *(MaskFactory::SobelSeparated(Asix::X)), false, edgeMode);
+    shared_ptr<Image> gradY = FilterManager::SeparatedFilter(source, *(MaskFactory::SobelSeparated(Asix::Y)), false, edgeMode);
 
-    shared_ptr<Image> result = make_shared<Image>(source->getHeight(), source->getWidth());
+    shared_ptr<Image> result = make_shared<Image>(source.getHeight(), source.getWidth());
 
-    int gX, gY;
+    double gX, gY;
+    double max = numeric_limits<double>::min(), min = numeric_limits<double>::max();
+    double pixel;
+
     for(int i=0; i<result->getHeight(); i++)
     {
         for(int j=0; j<result->getWidth(); j++)
         {
             gX = gradX->getPixel(i,j);
             gY = gradY->getPixel(i,j);
-            result->setPixel(i,j, qRound(sqrt(gX*gX + gY*gY)));
+            pixel = sqrt(gX*gX + gY*gY);
+            result->setPixel(i,j, pixel);
+            if(pixel > max)
+            {
+                max = pixel;
+            }
+            if(pixel < min)
+            {
+                min = pixel;
+            }
         }
     }
-    result->normalize(0, 255);
+    result->normalize(0, 255, min, max);
     return result;
 }

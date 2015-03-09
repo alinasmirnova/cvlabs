@@ -9,11 +9,11 @@ class Mask
 public:
     Mask(int h, int w);
 
-    double getPixel(int i, int j);
+    double getPixel(int i, int j) const;
     double setPixel(int i, int j, double value);
 
-    inline int getHeight();
-    inline int getWidth();
+    int getHeight() const;
+    int getWidth() const;
     ~Mask();
 private:
     unique_ptr<double[]> core;

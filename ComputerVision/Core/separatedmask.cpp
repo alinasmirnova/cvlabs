@@ -1,69 +1,41 @@
 #include "separatedmask.h"
 
-SeparatedMask::SeparatedMask(int size)
+shared_ptr<Mask> SeparatedMask::setRow(shared_ptr<Mask> r)
 {
-    s = size;
-    row = unique_ptr<float[]>(new float[size]);
-    column = unique_ptr<float[]>(new float[size]);
-}
-
-float SeparatedMask::getRowPixel(int i)
-{
-    if(i<size() && i>=0)
+    if(r->getHeight() == 1)
     {
-        return row[i];
+        row = r;
+        return row;
     }
     else
     {
-        qFatal("getRowPixel: index out of the range");
-        return -1;
+        qFatal("setRow: wrong row height");
+        return nullptr;
     }
 }
 
-float SeparatedMask::getColPixel(int i)
+shared_ptr<Mask> SeparatedMask::setColumn(shared_ptr<Mask> c)
 {
-    if(i<size() && i>=0)
+    if(c->getWidth() == 1)
     {
-        return column[i];
+        column = c;
+        return column;
     }
     else
     {
-        qFatal("getColPixel: index out of the range");
-        return -1;
+        qFatal("setColum: wrong column width");
+        return nullptr;
     }
 }
 
-float SeparatedMask::setRowPixel(int i, float value)
+shared_ptr<Mask> SeparatedMask::getRow() const
 {
-    if(i<size() && i>=0)
-    {
-        row[i] = value;
-        return value;
-    }
-    else
-    {
-        qFatal("setRowPixel: index out of the range");
-        return -1;
-    }
+    return row;
 }
 
-float SeparatedMask::setColPixel(int i, float value)
+shared_ptr<Mask> SeparatedMask::getColumn() const
 {
-    if(i<size() && i>=0)
-    {
-        column[i] = value;
-        return value;
-    }
-    else
-    {
-        qFatal("setColPixel: index out of the range");
-        return -1;
-    }
-}
-
-int SeparatedMask::size()
-{
-    return s;
+    return column;
 }
 
 SeparatedMask::~SeparatedMask()

@@ -4,10 +4,10 @@ Mask::Mask(int h, int w)
 {
     this->height = h;
     this->width = w;
-    core = make_unique<float[]>(h*w);
+    core = make_unique<double[]>(h*w);
 }
 
-float Mask::getPixel(int i, int j)
+double Mask::getPixel(int i, int j) const
 {
     if(i<height && j<width && i>=0 && j>=0)
     {
@@ -20,7 +20,7 @@ float Mask::getPixel(int i, int j)
     }
 }
 
-float Mask::setPixel(int i, int j, float value)
+double Mask::setPixel(int i, int j, double value)
 {
     if(i<height && j<width && i>=0 && j>=0)
     {
@@ -34,11 +34,11 @@ float Mask::setPixel(int i, int j, float value)
     }
 }
 
-int Mask::getHeight()
+int Mask::getHeight() const
 {
     return height;
 }
-int Mask::getWidth()
+int Mask::getWidth() const
 {
     return width;
 }

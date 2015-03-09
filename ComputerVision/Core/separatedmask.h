@@ -2,24 +2,21 @@
 #define SEPARATEDMASK_H
 #include <memory>
 #include <QDebug>
+#include "mask.h"
 using namespace std;
 class SeparatedMask
 {
 public:
-    SeparatedMask(int size);
-    float getRowPixel(int i);
-    float getColPixel(int i);
+    shared_ptr<Mask> setRow(shared_ptr<Mask> r);
+    shared_ptr<Mask> setColumn(shared_ptr<Mask> c);
 
-    float setRowPixel(int i, float value);
-    float setColPixel(int i, float value);
-
-    int size();
+    shared_ptr<Mask> getRow() const;
+    shared_ptr<Mask> getColumn() const;
 
     ~SeparatedMask();
 private:
-    int s;
-    unique_ptr<float[]> row;
-    unique_ptr<float[]> column;
+    shared_ptr<Mask> row;
+    shared_ptr<Mask> column;
 };
 
-#endif // SEPARATEDMASK_H
+#endif

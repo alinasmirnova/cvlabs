@@ -4,6 +4,7 @@
 #include <limits>
 #include <QImage>
 #include <QtDebug>
+#include <math.h>
 using namespace std;
 
 enum EdgeMode
@@ -21,14 +22,14 @@ public:
     static shared_ptr<Image> fromFile(const QString &fileName);
     static shared_ptr<Image> fromQImage(QImage picture);
 
-    QImage toQImage();
-    void normalize(double min, double max, double bottom = INT_MAX, double top = INT_MIN);
+    QImage toQImage() const;
+    void normalize(double min, double max, double bottom = numeric_limits<double>::max(), double top = numeric_limits<double>::min());
 
-    double getPixel(int i, int j, EdgeMode mode=EdgeMode::ZEROS);
+    double getPixel(int i, int j, EdgeMode mode=EdgeMode::ZEROS) const;
     double setPixel(int i, int j, double value);
 
-    int getHeight();
-    int getWidth();
+    int getHeight() const;
+    int getWidth() const;
 
 private:
     unique_ptr<double[]> image;

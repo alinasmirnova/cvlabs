@@ -45,7 +45,7 @@ shared_ptr<Image> Image::fromQImage(QImage picture)
     return result;
 }
 
-QImage Image::toQImage()
+QImage Image::toQImage() const
 {
     QImage result = QImage(width, height, QImage::Format_RGB32);
     int color;
@@ -60,7 +60,7 @@ QImage Image::toQImage()
     return result;
 }
 
-double Image::getPixel(int i, int j, EdgeMode mode)
+double Image::getPixel(int i, int j, EdgeMode mode) const
 {
     if(i<height && j<width && i>=0 && j>=0)
     {
@@ -84,7 +84,7 @@ double Image::getPixel(int i, int j, EdgeMode mode)
     return 0;
 }
 
-int Image::setPixel(int i, int j, double value)
+double Image::setPixel(int i, int j, double value)
 {
     if(i<height && j<width && i>=0 && j>=0)
     {
@@ -126,12 +126,12 @@ int Image::setPixel(int i, int j, double value)
      }
  }
 
-int Image::getHeight()
+int Image::getHeight() const
 {
     return height;
 }
 
-int Image::getWidth()
+int Image::getWidth() const
 {
     return width;
 }

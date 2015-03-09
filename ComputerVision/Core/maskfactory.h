@@ -27,9 +27,9 @@ public:
     static shared_ptr<Mask> Sobel(Asix asix);
     static shared_ptr<Mask> Pruit(Asix asix);
     static shared_ptr<Mask> Shar(Asix asix);
-    static shared_ptr<Mask> Gauss(int k, int theta);
+    static shared_ptr<Mask> Gauss(double sigma);
 
-    static shared_ptr<SeparatedMask> GaussSeparated(int k, int theta);
+    static shared_ptr<SeparatedMask> GaussSeparated(double sigma);
     static shared_ptr<SeparatedMask> SobelSeparated(Asix asix);
 
     ~MaskFactory();
