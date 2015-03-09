@@ -7,8 +7,8 @@
 TARGET = Core
 TEMPLATE = lib
 CONFIG += staticlib
-CONFIG += c++11
-QMAKE_CXXFLAGS += -std=c++11
+CONFIG += c++1y
+QMAKE_CXXFLAGS += -std=c++1y
 
 SOURCES += image.cpp \
     filtermanager.cpp \
