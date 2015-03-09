@@ -3,7 +3,7 @@
 
 Image::Image(int h, int w)
 {
-    image = unique_ptr<int[]>(new int[h*w]);
+    image = make_unique<double[]>(h*w);
     height = h;
     width = w;
 }
@@ -28,16 +28,16 @@ shared_ptr<Image> Image::fromQImage(QImage picture)
 {
     shared_ptr<Image> result = make_shared<Image>(picture.height(), picture.width());
     QRgb original;
-    int color;
+    double color;
 
     for(int i=0; i<picture.height(); i++)
     {
         for(int j=0; j<picture.width(); j++)
         {
             original = picture.pixel(j,i);
-            color = qRound(0.299 * qRed(original) +
-                           0.587 * qGreen(original) +
-                           0.114 * qBlue(original));
+            color = 0.299 * qRed(original) +
+                    0.587 * qGreen(original) +
+                    0.114 * qBlue(original);
             result->setPixel(i,j,color);
         }
     }
@@ -53,14 +53,14 @@ QImage Image::toQImage()
     {
         for(int j=0; j<width; j++)
         {
-            color = getPixel(i, j);
+            color = qRound(getPixel(i, j));
             result.setPixel(j, i, qRgb(color,color,color));
         }
     }
     return result;
 }
 
-int Image::getPixel(int i, int j, EdgeMode mode)
+double Image::getPixel(int i, int j, EdgeMode mode)
 {
     if(i<height && j<width && i>=0 && j>=0)
     {
@@ -72,7 +72,7 @@ int Image::getPixel(int i, int j, EdgeMode mode)
         {
             case EdgeMode::ZEROS: return 0;
             case EdgeMode::COPY:
-                 return image[min(max(i,0), 255)*width + min(max(j,0), 255)];
+                 return image[min(max(i,0), height-1)*width + min(max(j,0), width-1)];
             case EdgeMode::MIRROR:
                 if(i<0) i = i*(-1);
                 if(j<0) j = j*(-1);
@@ -84,7 +84,7 @@ int Image::getPixel(int i, int j, EdgeMode mode)
     return 0;
 }
 
-int Image::setPixel(int i, int j, int value)
+int Image::setPixel(int i, int j, double value)
 {
     if(i<height && j<width && i>=0 && j>=0)
     {
@@ -98,9 +98,9 @@ int Image::setPixel(int i, int j, int value)
     }
 }
 
- void Image::normalize(int min, int max, int bottom, int top)
+ void Image::normalize(double min, double max, double bottom, double top)
  {
-     if(bottom == INT_MAX || top == INT_MIN)
+     if(bottom == numeric_limits<double>::max()  || top ==  numeric_limits<double>::min() )
      {
          for(int i=0; i<height; i++)
          {

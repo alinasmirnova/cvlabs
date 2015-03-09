@@ -7,11 +7,11 @@
 class FilterManager
 {
 public:
-    static shared_ptr<Image> Filter(shared_ptr<Image> source, shared_ptr<Mask> mask, bool norm = true);
-    static shared_ptr<Image> SeparatedFilter(shared_ptr<Image> source, shared_ptr<SeparatedMask> mask, bool norm = true);
+    static shared_ptr<Image> Filter(const Image &source, const Mask& mask, bool norm = true);
+    static shared_ptr<Image> SeparatedFilter(const Image& source, const SeparatedMask &mask, bool norm = true);
 
-    static shared_ptr<Image> SobelOperator(shared_ptr<Image> source);
-    static shared_ptr<Image> SobelOperatorSeparated(shared_ptr<Image> source);
+    static shared_ptr<Image> SobelOperator(const Image &source);
+    static shared_ptr<Image> SobelOperatorSeparated(const Image &source);
 
 };
 

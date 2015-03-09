@@ -1,6 +1,7 @@
 #ifndef IMAGE_H
 #define IMAGE_H
 #include <memory>
+#include <limits>
 #include <QImage>
 #include <QtDebug>
 using namespace std;
@@ -21,16 +22,16 @@ public:
     static shared_ptr<Image> fromQImage(QImage picture);
 
     QImage toQImage();
-    void normalize(int min, int max, int bottom = INT_MAX, int top = INT_MIN);
+    void normalize(double min, double max, double bottom = INT_MAX, double top = INT_MIN);
 
-    int getPixel(int i, int j, EdgeMode mode=EdgeMode::ZEROS);
-    int setPixel(int i, int j, int value);
+    double getPixel(int i, int j, EdgeMode mode=EdgeMode::ZEROS);
+    double setPixel(int i, int j, double value);
 
     int getHeight();
     int getWidth();
 
 private:
-    unique_ptr<int[]> image;
+    unique_ptr<double[]> image;
     int height;
     int width;
 };

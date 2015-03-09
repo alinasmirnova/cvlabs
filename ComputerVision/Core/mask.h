@@ -9,16 +9,16 @@ class Mask
 public:
     Mask(int h, int w);
 
-    float getPixel(int i, int j);
-    float setPixel(int i, int j, float value);
+    double getPixel(int i, int j);
+    double setPixel(int i, int j, double value);
 
     inline int getHeight();
     inline int getWidth();
     ~Mask();
 private:
-    unique_ptr<float[]> core;
+    unique_ptr<double[]> core;
     int height;
     int width;
 };
 
-#endif // MASK_H
+#endif
