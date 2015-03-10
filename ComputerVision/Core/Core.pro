@@ -14,14 +14,16 @@ SOURCES += image.cpp \
     filtermanager.cpp \
     maskfactory.cpp \
     mask.cpp \
-    separatedmask.cpp
+    separatedmask.cpp \
+    piramida.cpp
 
 HEADERS += image.h \
     filtermanager.h \
     maskfactory.h \
     mask.h \
     core.h \
-    separatedmask.h
+    separatedmask.h \
+    piramida.h
 unix {
     target.path = /usr/lib
     INSTALLS += target

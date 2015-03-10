@@ -125,7 +125,7 @@ shared_ptr<Mask> MaskFactory::Shar(Asix asix)
 
 shared_ptr<Mask> MaskFactory::Gauss(double sigma)
 {
-    int k = qRound(sigma) + 2;
+    int k = 3*sigma;
     int size = 2*k+1;
     shared_ptr<Mask> result = make_shared<Mask>(size,size);
     int x, y;
@@ -177,7 +177,7 @@ shared_ptr<SeparatedMask> MaskFactory::SobelSeparated(Asix asix)
 
 shared_ptr<SeparatedMask> MaskFactory::GaussSeparated(double sigma)
 {
-    int k = qRound(sigma) + 2;
+    int k = 3*sigma;
     int size = 2*k+1;
     shared_ptr<SeparatedMask> result = make_shared<SeparatedMask>();
     shared_ptr<Mask> rowMask = make_shared<Mask>(1,size);

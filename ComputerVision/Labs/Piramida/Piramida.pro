@@ -1,6 +1,6 @@
 #-------------------------------------------------
 #
-# Project created by QtCreator 2015-02-28T19:23:39
+# Project created by QtCreator 2015-03-10T13:09:50
 #
 #-------------------------------------------------
 
@@ -8,7 +8,7 @@ QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-TARGET = Filters
+TARGET = Piramida
 TEMPLATE = app
 CONFIG += c++1y
 QMAKE_CXXFLAGS += -std=c++1y

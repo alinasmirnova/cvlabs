@@ -23,6 +23,9 @@ public:
     static shared_ptr<Image> fromQImage(QImage picture);
 
     QImage toQImage() const;
+    bool toFile(const QString &fileName)const;
+
+    shared_ptr<Image> compress(int scale) const;
     void normalize(double min, double max, double bottom = numeric_limits<double>::max(), double top = numeric_limits<double>::min());
 
     double getPixel(int i, int j, EdgeMode mode=EdgeMode::ZEROS) const;

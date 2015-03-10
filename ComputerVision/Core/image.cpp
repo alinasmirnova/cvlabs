@@ -60,6 +60,26 @@ QImage Image::toQImage() const
     return result;
 }
 
+bool Image::toFile(const QString &fileName) const
+{
+    QImage image = toQImage();
+    return image.save(fileName, "JPEG");
+}
+
+shared_ptr<Image> Image::compress(int scale) const
+{
+    shared_ptr<Image> result = make_shared<Image>(height/scale, width/scale);
+
+    for(int i=0; i<result->getHeight(); i++)
+    {
+        for(int j=0; j<result->getWidth(); j++)
+        {
+            result->setPixel(i,j,getPixel(i*scale, j*scale));
+        }
+    }
+    return result;
+}
+
 double Image::getPixel(int i, int j, EdgeMode mode) const
 {
     if(i<height && j<width && i>=0 && j>=0)
@@ -74,10 +94,10 @@ double Image::getPixel(int i, int j, EdgeMode mode) const
             case EdgeMode::COPY:
                  return image[min(max(i,0), height-1)*width + min(max(j,0), width-1)];
             case EdgeMode::MIRROR:
-                if(i<0) i = i*(-1);
-                if(j<0) j = j*(-1);
-                if(i>height) i = height - (i%height);
-                if(j>width) j = width - (j%width);
+                if(i<0) i = i*(-1) - 1;
+                if(j<0) j = j*(-1) - 1;
+                if(i>=height) i = height - (i%height) - 1;
+                if(j>=width) j = width - (j%width) - 1;
                 return image[i*width + j];
         }
     }

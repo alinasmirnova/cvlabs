@@ -5,5 +5,6 @@
 #include "filtermanager.h"
 #include "maskfactory.h"
 #include "separatedmask.h"
+#include "piramida.h"
 #endif
 
