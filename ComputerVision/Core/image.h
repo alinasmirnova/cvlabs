@@ -26,16 +26,16 @@ public:
     bool toFile(const QString &fileName)const;
 
     shared_ptr<Image> compress(int scale) const;
-    void normalize(double min, double max, double bottom = numeric_limits<double>::max(), double top = numeric_limits<double>::min());
+    void normalize(float min, float max, float bottom = numeric_limits<float>::max(), float top = numeric_limits<float>::min());
 
-    double getPixel(int i, int j, EdgeMode mode=EdgeMode::ZEROS) const;
-    double setPixel(int i, int j, double value);
+    float getPixel(int i, int j, EdgeMode mode=EdgeMode::ZEROS) const;
+    float setPixel(int i, int j, float value);
 
     int getHeight() const;
     int getWidth() const;
 
 private:
-    unique_ptr<double[]> image;
+    unique_ptr<float[]> image;
     int height;
     int width;
 };

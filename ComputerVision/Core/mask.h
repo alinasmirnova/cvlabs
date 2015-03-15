@@ -9,14 +9,14 @@ class Mask
 public:
     Mask(int h, int w);
 
-    double getPixel(int i, int j) const;
-    double setPixel(int i, int j, double value);
+    float getPixel(int i, int j) const;
+    float setPixel(int i, int j, float value);
 
     int getHeight() const;
     int getWidth() const;
     ~Mask();
 private:
-    unique_ptr<double[]> core;
+    unique_ptr<float[]> core;
     int height;
     int width;
 };

@@ -51,15 +51,18 @@ shared_ptr<Mask> MaskFactory::Blur(int k, int blur)
 shared_ptr<Mask> MaskFactory::Sobel(Asix asix)
 {
     shared_ptr<Mask> result = make_shared<Mask>(3,3);
-    double *mask;
+    float *mask;
 
     switch(asix)
     {
     case Asix::X:
-        mask = new double[9]{-1,0,1,-2,0,2,-1,0,1};
+        static float mask1[] = {-1,0,1,-2,0,2,-1,0,1};
+        mask = mask1;
         break;
     case Asix::Y:
-        mask = new double[9]{-1,-2,-1,0,0,0,1,2,1};
+        static float mask2[] = {-1,-2,-1,0,0,0,1,2,1};
+        mask = mask2;
+        break;
     }
 
     for(int i=0; i<3; i++)
@@ -69,22 +72,23 @@ shared_ptr<Mask> MaskFactory::Sobel(Asix asix)
             result->setPixel(i,j,mask[i*3+j]);
         }
     }
-    delete mask;
     return result;
 }
 
 shared_ptr<Mask> MaskFactory::Pruit(Asix asix)
 {
     shared_ptr<Mask> result = make_shared<Mask>(3,3);
-    double *mask;
+    float *mask;
 
     switch(asix)
     {
     case Asix::X:
-        mask = new double[9]{-1,0,1,-1,0,1,-1,0,1};
+        static float mask1[] = {-1,0,1,-1,0,1,-1,0,1};
+        mask = mask1;
         break;
     case Asix::Y:
-        mask = new double[9]{-1,-1,-1,0,0,0,1,1,1};
+        static float mask2[] = {-1,-1,-1,0,0,0,1,1,1};
+        mask = mask2;
     }
 
     for(int i=0; i<3; i++)
@@ -94,22 +98,23 @@ shared_ptr<Mask> MaskFactory::Pruit(Asix asix)
             result->setPixel(i,j,mask[i*3+j]);
         }
     }
-    delete mask;
     return result;
 }
 
 shared_ptr<Mask> MaskFactory::Shar(Asix asix)
 {
     shared_ptr<Mask> result = make_shared<Mask>(3,3);
-    double *mask;
+    float *mask;
 
     switch(asix)
     {
     case Asix::X:
-        mask = new double[9]{-3,0,3,-10,0,10,-3,0,3};
+        static float mask1[] = {-3,0,3,-10,0,10,-3,0,3};
+        mask = mask1;
         break;
     case Asix::Y:
-        mask = new double[9]{-3,-10,-3,0,0,0,3,10,3};
+        static float mask2[] = {-3,-10,-3,0,0,0,3,10,3};
+        mask = mask2;
     }
 
     for(int i=0; i<3; i++)
@@ -119,17 +124,16 @@ shared_ptr<Mask> MaskFactory::Shar(Asix asix)
             result->setPixel(i,j,mask[i*3+j]);
         }
     }
-    delete mask;
     return result;
 }
 
-shared_ptr<Mask> MaskFactory::Gauss(double sigma)
+shared_ptr<Mask> MaskFactory::Gauss(float sigma)
 {
     int k = 3*sigma;
     int size = 2*k+1;
     shared_ptr<Mask> result = make_shared<Mask>(size,size);
     int x, y;
-    double value;
+    float value;
     for(int i=0; i<size; i++)
     {
         for(int j=0; j<size; j++)
@@ -146,8 +150,8 @@ shared_ptr<Mask> MaskFactory::Gauss(double sigma)
 shared_ptr<SeparatedMask> MaskFactory::SobelSeparated(Asix asix)
 {
     shared_ptr<SeparatedMask> result = make_shared<SeparatedMask>();
-    double *row;
-    double *column;
+    float *row;
+    float *column;
 
     shared_ptr<Mask> rowMask = make_shared<Mask>(1,3);
     shared_ptr<Mask> columnMask = make_shared<Mask>(3,1);
@@ -155,12 +159,17 @@ shared_ptr<SeparatedMask> MaskFactory::SobelSeparated(Asix asix)
     switch(asix)
     {
     case Asix::X:
-        row = new double[3]{-1,0,1};
-        column = new double[3]{1,2,1};
+        static float row1[] = {-1,0,-1};
+        static float column1 [] = {1,2,1};
+        row = row1;
+        column = column1;
         break;
+
     case Asix::Y:
-        row = new double[3]{1,2,1};
-        column = new double[3]{1,0,-1};
+        static float row2[] = {1,2,1};
+        static float column2 [] = {1,0,-1};
+        row = row2;
+        column = column2;
     }
 
     for(int i=0; i<3; i++)
@@ -170,12 +179,11 @@ shared_ptr<SeparatedMask> MaskFactory::SobelSeparated(Asix asix)
     }
     result->setColumn(columnMask);
     result->setRow(rowMask);
-    delete row;
-    delete column;
+
     return result;
 }
 
-shared_ptr<SeparatedMask> MaskFactory::GaussSeparated(double sigma)
+shared_ptr<SeparatedMask> MaskFactory::GaussSeparated(float sigma)
 {
     int k = 3*sigma;
     int size = 2*k+1;
@@ -184,7 +192,7 @@ shared_ptr<SeparatedMask> MaskFactory::GaussSeparated(double sigma)
     shared_ptr<Mask> columnMask = make_shared<Mask>(size,1);
 
     int x;
-    double value;
+    float value;
     for(int i=0; i<size; i++)
     {
         x = i - k;

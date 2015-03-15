@@ -23,7 +23,7 @@ private:
     Ui::MainWindow *ui;
 private slots:
     void openFile();
-    void buildPiramid();
+    void buildPyramid();
 };
 
 #endif // MAINWINDOW_H

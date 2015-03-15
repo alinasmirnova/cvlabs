@@ -4,11 +4,11 @@ shared_ptr<Image> FilterManager::Filter(const Image &source, const Mask &mask, b
 {
     shared_ptr<Image> result = make_shared<Image>(source.getHeight(), source.getWidth());
 
-    double pixel;
+    float pixel;
     int heighHalf = (mask.getHeight() - 1)/2;
     int widthHalf = (mask.getWidth() - 1)/2;
 
-    double max = numeric_limits<double>::min(), min = numeric_limits<double>::max() ;
+    float max = numeric_limits<float>::min(), min = numeric_limits<float>::max() ;
 
 
     for(int i=0; i<result->getHeight(); i++)
@@ -46,9 +46,9 @@ shared_ptr<Image> FilterManager::SobelOperator(const Image &source, EdgeMode edg
 
     shared_ptr<Image> result = make_shared<Image>(source.getHeight(), source.getWidth());
 
-    double gX, gY;
-    double max = numeric_limits<double>::min(), min = numeric_limits<double>::max();
-    double pixel;
+    float gX, gY;
+    float max = numeric_limits<float>::min(), min = numeric_limits<float>::max();
+    float pixel;
 
     for(int i=0; i<result->getHeight(); i++)
     {
@@ -88,9 +88,9 @@ shared_ptr<Image> FilterManager::SobelOperatorSeparated(const Image &source, Edg
 
     shared_ptr<Image> result = make_shared<Image>(source.getHeight(), source.getWidth());
 
-    double gX, gY;
-    double max = numeric_limits<double>::min(), min = numeric_limits<double>::max();
-    double pixel;
+    float gX, gY;
+    float max = numeric_limits<float>::min(), min = numeric_limits<float>::max();
+    float pixel;
 
     for(int i=0; i<result->getHeight(); i++)
     {

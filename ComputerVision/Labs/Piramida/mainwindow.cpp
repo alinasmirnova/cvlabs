@@ -7,7 +7,7 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     connect(ui->chooseFileButton, SIGNAL(clicked()), this, SLOT(openFile()));
-    connect(ui->buildPiramid, SIGNAL(clicked()), this, SLOT(buildPiramid()));
+    connect(ui->buildPiramid, SIGNAL(clicked()), this, SLOT(buildPyramid()));
 }
 
 void MainWindow::openFile()
@@ -29,12 +29,12 @@ void MainWindow::openFile()
     }
 }
 
-void MainWindow::buildPiramid()
+void MainWindow::buildPyramid()
 {
     image = Image::fromFile(ui->fileName->text());
     if(image != nullptr)
     {
-        shared_ptr<Piramida> piramid = Piramida::Build(*image, ui->octaveNumber->value(), ui->levelNumber->value());
+        shared_ptr<Pyramid> piramid = Pyramid::Build(*image, ui->octaveNumber->value(), ui->levelNumber->value());
         bool result = piramid->saveToFolder(folder);
         QMessageBox msgBox;
         if(result)

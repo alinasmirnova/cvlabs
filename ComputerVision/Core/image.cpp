@@ -3,7 +3,7 @@
 
 Image::Image(int h, int w)
 {
-    image = make_unique<double[]>(h*w);
+    image = make_unique<float[]>(h*w);
     height = h;
     width = w;
 }
@@ -28,7 +28,7 @@ shared_ptr<Image> Image::fromQImage(QImage picture)
 {
     shared_ptr<Image> result = make_shared<Image>(picture.height(), picture.width());
     QRgb original;
-    double color;
+    float color;
 
     for(int i=0; i<picture.height(); i++)
     {
@@ -80,7 +80,7 @@ shared_ptr<Image> Image::compress(int scale) const
     return result;
 }
 
-double Image::getPixel(int i, int j, EdgeMode mode) const
+float Image::getPixel(int i, int j, EdgeMode mode) const
 {
     if(i<height && j<width && i>=0 && j>=0)
     {
@@ -104,7 +104,7 @@ double Image::getPixel(int i, int j, EdgeMode mode) const
     return 0;
 }
 
-double Image::setPixel(int i, int j, double value)
+float Image::setPixel(int i, int j, float value)
 {
     if(i<height && j<width && i>=0 && j>=0)
     {
@@ -118,9 +118,9 @@ double Image::setPixel(int i, int j, double value)
     }
 }
 
- void Image::normalize(double min, double max, double bottom, double top)
+ void Image::normalize(float min, float max, float bottom, float top)
  {
-     if(bottom == numeric_limits<double>::max()  || top ==  numeric_limits<double>::min() )
+     if(bottom == numeric_limits<float>::max()  || top ==  numeric_limits<float>::min() )
      {
          for(int i=0; i<height; i++)
          {
