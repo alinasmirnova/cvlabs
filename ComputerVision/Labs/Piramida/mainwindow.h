@@ -14,6 +14,8 @@ class MainWindow : public QMainWindow
 {
     Q_OBJECT
     shared_ptr<Image> image;
+    shared_ptr<Pyramid> pyramid;
+
     QString folder;
 public:
     explicit MainWindow(QWidget *parent = 0);
@@ -24,6 +26,7 @@ private:
 private slots:
     void openFile();
     void buildPyramid();
+    void findL();
 };
 
 #endif // MAINWINDOW_H

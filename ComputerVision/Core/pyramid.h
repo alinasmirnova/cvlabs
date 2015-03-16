@@ -17,7 +17,8 @@ public:
 
     bool saveToFolder(const QString &folderName);
 
-    static shared_ptr<Pyramid> Build(const Image &image, int octaveNum, int levelNum, float sigma0 = 1, float sigmaInit = 0.5);
+    static shared_ptr<Pyramid> build(const Image &image, int octaveNum, int levelNum, float sigma0 = 1, float sigmaInit = 0.5);
+    float findPixel(int i, int j, float sigma);
 
     ~Pyramid();
 };
