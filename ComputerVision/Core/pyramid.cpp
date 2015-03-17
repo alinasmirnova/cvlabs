@@ -65,7 +65,7 @@ float Pyramid::findPixel(int i, int j, float sigma)
 
     if(sigma >= images.back()->getSigma())
     {
-        scale = 2*images.back()->getOctave();
+        scale = 2^images.back()->getOctave();
         if(scale == 0) scale = 1;
 
         return images.back()->getImage()->getPixel(i/scale, j/scale);
@@ -82,8 +82,7 @@ float Pyramid::findPixel(int i, int j, float sigma)
     }
     int octave = images[lowNum]->getOctave();
 
-    scale = 2*octave;
-    if(scale == 0) scale = 1;
+    scale = 2^octave;
 
     float lowPixel = images[lowNum]->getImage()->getPixel(i/scale, j/scale);
     float highPixel = images[lowNum+1]->getImage()->getPixel(i/scale, j/scale);
