@@ -18,4 +18,5 @@ else:unix: PRE_TARGETDEPS += $$OUT_PWD/../Core/libCore.a
 
 SUBDIRS += \
     Filters \
-    Piramida
+    Piramida \
+    InterestingPoints

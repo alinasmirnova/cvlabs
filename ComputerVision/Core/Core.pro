@@ -16,7 +16,8 @@ SOURCES += image.cpp \
     mask.cpp \
     separatedmask.cpp \
     pyramid.cpp \
-    pyramidlevel.cpp
+    pyramidlevel.cpp \
+    detectors.cpp
 
 HEADERS += image.h \
     filtermanager.h \
@@ -25,7 +26,8 @@ HEADERS += image.h \
     core.h \
     separatedmask.h \
     pyramid.h \
-    pyramidlevel.h
+    pyramidlevel.h \
+    detectors.h
 unix {
     target.path = /usr/lib
     INSTALLS += target

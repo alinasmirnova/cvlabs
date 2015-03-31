@@ -5,14 +5,14 @@
 #define M_PI 3.14159265358979323846
 #define M_E 2.71828182845905
 
-enum Direction{
+enum class Direction{
     LEFT = 0,
     RIGHT = 1,
     UP = 2,
     DOWN = 3
 };
 
-enum Asix{
+enum class Asix{
     X = 0,
     Y = 1
 };
