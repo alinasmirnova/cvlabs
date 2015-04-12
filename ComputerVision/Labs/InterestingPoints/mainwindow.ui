@@ -6,125 +6,14 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>300</height>
+    <width>402</width>
+    <height>280</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <widget class="QTabWidget" name="tabWidget">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>100</y>
-      <width>381</width>
-      <height>191</height>
-     </rect>
-    </property>
-    <widget class="QWidget" name="tab">
-     <attribute name="title">
-      <string>Моравек</string>
-     </attribute>
-     <widget class="QLabel" name="label">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>10</y>
-        <width>101</width>
-        <height>16</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Полуразмер окна:</string>
-      </property>
-     </widget>
-     <widget class="QSpinBox" name="windowSize">
-      <property name="geometry">
-       <rect>
-        <x>120</x>
-        <y>10</y>
-        <width>61</width>
-        <height>22</height>
-       </rect>
-      </property>
-      <property name="value">
-       <number>3</number>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_2">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>50</y>
-        <width>291</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Размер окрестности для поиска локальных максимумов:</string>
-      </property>
-     </widget>
-     <widget class="QSpinBox" name="localMax">
-      <property name="geometry">
-       <rect>
-        <x>310</x>
-        <y>50</y>
-        <width>51</width>
-        <height>22</height>
-       </rect>
-      </property>
-      <property name="value">
-       <number>4</number>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_3">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>90</y>
-        <width>121</width>
-        <height>16</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Пороговое значение:</string>
-      </property>
-     </widget>
-     <widget class="QDoubleSpinBox" name="minS">
-      <property name="geometry">
-       <rect>
-        <x>140</x>
-        <y>90</y>
-        <width>61</width>
-        <height>22</height>
-       </rect>
-      </property>
-      <property name="value">
-       <double>0.150000000000000</double>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="findMoravek">
-      <property name="geometry">
-       <rect>
-        <x>150</x>
-        <y>130</y>
-        <width>75</width>
-        <height>23</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Найти</string>
-      </property>
-     </widget>
-    </widget>
-    <widget class="QWidget" name="tab_2">
-     <attribute name="title">
-      <string>Tab 2</string>
-     </attribute>
-    </widget>
-   </widget>
    <widget class="QLineEdit" name="fileName">
     <property name="geometry">
      <rect>
@@ -149,6 +38,174 @@
     </property>
     <property name="text">
      <string>Выбрать</string>
+    </property>
+   </widget>
+   <widget class="QFrame" name="frame">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>110</y>
+      <width>381</width>
+      <height>161</height>
+     </rect>
+    </property>
+    <property name="frameShape">
+     <enum>QFrame::StyledPanel</enum>
+    </property>
+    <property name="frameShadow">
+     <enum>QFrame::Raised</enum>
+    </property>
+    <widget class="QLabel" name="label">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>30</y>
+       <width>101</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Полуразмер окна:</string>
+     </property>
+    </widget>
+    <widget class="QSpinBox" name="windowSize">
+     <property name="geometry">
+      <rect>
+       <x>110</x>
+       <y>30</y>
+       <width>61</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="value">
+      <number>3</number>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_2">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>60</y>
+       <width>311</width>
+       <height>21</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Полуразмер окрестности для поиска локальных максимумов:</string>
+     </property>
+    </widget>
+    <widget class="QSpinBox" name="localMax">
+     <property name="geometry">
+      <rect>
+       <x>330</x>
+       <y>60</y>
+       <width>51</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="value">
+      <number>4</number>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_3">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>90</y>
+       <width>121</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Пороговое значение:</string>
+     </property>
+    </widget>
+    <widget class="QDoubleSpinBox" name="minS">
+     <property name="geometry">
+      <rect>
+       <x>120</x>
+       <y>90</y>
+       <width>61</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="maximum">
+      <double>1000000.000000000000000</double>
+     </property>
+     <property name="value">
+      <double>2000.000000000000000</double>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="findPoints">
+     <property name="geometry">
+      <rect>
+       <x>150</x>
+       <y>120</y>
+       <width>75</width>
+       <height>23</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Найти</string>
+     </property>
+    </widget>
+    <widget class="QComboBox" name="algo">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>0</y>
+       <width>251</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="currentIndex">
+      <number>-1</number>
+     </property>
+     <property name="maxCount">
+      <number>2147483647</number>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QCheckBox" name="suppress">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>50</y>
+      <width>201</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Adaptive Non-Maximum Suppression</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_4">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>80</y>
+      <width>171</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Максимальное колчество точек:</string>
+    </property>
+   </widget>
+   <widget class="QSpinBox" name="pointNum">
+    <property name="geometry">
+     <rect>
+      <x>190</x>
+      <y>80</y>
+      <width>81</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="maximum">
+     <number>1000</number>
+    </property>
+    <property name="value">
+     <number>100</number>
     </property>
    </widget>
   </widget>

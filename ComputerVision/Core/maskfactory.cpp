@@ -185,7 +185,7 @@ shared_ptr<SeparatedMask> MaskFactory::SobelSeparated(Asix asix)
 
 shared_ptr<SeparatedMask> MaskFactory::GaussSeparated(float sigma)
 {
-    int k = 3*sigma;
+    int k = ceil(3*sigma);
     int size = 2*k+1;
     shared_ptr<SeparatedMask> result = make_shared<SeparatedMask>();
     shared_ptr<Mask> rowMask = make_shared<Mask>(1,size);

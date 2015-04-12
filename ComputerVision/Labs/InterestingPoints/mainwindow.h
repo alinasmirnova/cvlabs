@@ -24,8 +24,7 @@ private:
 
 private slots:
     void chooseFile();
-    void findMoravek();
-    void findHarris();
+    void findPoints();
 };
 
 #endif // MAINWINDOW_H

@@ -14,7 +14,7 @@ bool Pyramid::saveToFolder(const QString &folderName)
     }
     QString fileName;
     bool result = true;
-    for(int i=0; i<images.size(); i++)
+    for(uint i=0; i<images.size(); i++)
     {
         fileName = "Octave" + QString::number(images[i]->getOctave()) + "Level" + QString::number(images[i]->getLevel()) + "Sigma" + QString::number(images[i]->getSigma());
         result = result && images[i]->getImage()->toFile(folderName + "/" + fileName + ".jpg");
@@ -65,14 +65,14 @@ float Pyramid::findPixel(int i, int j, float sigma)
 
     if(sigma >= images.back()->getSigma())
     {
-        scale = 2^images.back()->getOctave();
+        scale = pow(2,images.back()->getOctave());
         if(scale == 0) scale = 1;
 
         return images.back()->getImage()->getPixel(i/scale, j/scale);
     }
 
     int lowNum = 0;
-    for(int k=0; k<images.size() - 1; k++)
+    for(uint k=0; k<images.size() - 1; k++)
     {
         if(sigma <= images[k+1]->getSigma() && sigma >= images[k]->getSigma())
         {
@@ -82,7 +82,7 @@ float Pyramid::findPixel(int i, int j, float sigma)
     }
     int octave = images[lowNum]->getOctave();
 
-    scale = 2^octave;
+    scale = pow(2,octave);
 
     float lowPixel = images[lowNum]->getImage()->getPixel(i/scale, j/scale);
     float highPixel = images[lowNum+1]->getImage()->getPixel(i/scale, j/scale);

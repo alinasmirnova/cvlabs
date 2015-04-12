@@ -7,7 +7,11 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     connect(ui->chooseFile, SIGNAL(clicked()), this, SLOT(chooseFile()));
-    connect(ui->findMoravek, SIGNAL(clicked()), this, SLOT(findMoravek()));
+    connect(ui->findPoints, SIGNAL(clicked()), this, SLOT(findPoints()));
+
+    ui->algo->addItem("Моравек");
+    ui->algo->addItem("Харрис");
+    ui->algo->setCurrentIndex(0);
 }
 
 void MainWindow::chooseFile()
@@ -30,9 +34,24 @@ void MainWindow::chooseFile()
     }
 }
 
-void MainWindow::findMoravek()
+void MainWindow::findPoints()
 {
-    vector<Point> points = Detectors::Moravec(*image, ui->windowSize->value(), ui->localMax->value(), ui->minS->value());
+
+    vector<Point> points;
+    if(ui->algo->currentIndex() == 0)
+    {
+        points = Detectors::Moravec(*image, ui->windowSize->value(), ui->localMax->value(), ui->minS->value());
+    }
+    else
+    {
+        points = Detectors::Harris(*image, ui->windowSize->value(), ui->localMax->value(), ui->minS->value());
+    }
+
+    if(ui->suppress->isChecked())
+    {
+        int pointNum = ui->pointNum->value();
+        points = Detectors::AdaptiveNonMaximumSuppression(points, pointNum, max(image->getHeight(), image->getWidth()));
+    }
 
     QImage qImg = image->toQImage();
     QPainter p(&qImg);
@@ -40,20 +59,13 @@ void MainWindow::findMoravek()
     p.setPen(QPen(QColor(Qt::red)));
     p.setBrush(QBrush(QColor(Qt::red)));
 
-    for(int i=0; i<points.size(); i++) {
-        p.fillRect(points[i].x, points[i].y, 1,1, QColor(Qt::red));
+    for(uint i=0; i<points.size(); i++) {
+        p.fillRect(points[i].x - 1, points[i].y - 1, 3, 3, QColor(Qt::red));
     }
 
     p.end();
 
-
-
     qImg.save("E:\\Pictures\\1.jpg");
-}
-
-void MainWindow::findHarris()
-{
-
 }
 
 MainWindow::~MainWindow()
