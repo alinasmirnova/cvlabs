@@ -7,5 +7,6 @@
 #include "separatedmask.h"
 #include "pyramid.h"
 #include "detectors.h"
+#include "descriptorgenerator.h"
 #endif
 

@@ -132,7 +132,8 @@ vector<Point> Detectors::Harris(const Image &image, int halfSizeW, int localMaxS
             lambda1 = (a+c+d)/2;
             lambda2 = (a+c-d)/2;
 
-            lambda = min(lambda1, lambda2);
+            lambda = min(lambda1, lambda2) - 0.05*max(lambda1, lambda2);
+
             L->setPixel(i,j,lambda);
         }
     }
