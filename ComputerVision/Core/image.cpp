@@ -45,6 +45,74 @@ shared_ptr<Image> Image::fromQImage(QImage picture)
     return result;
 }
 
+shared_ptr<Image> Image::getNoisy(const Image& img)
+{
+    srand(time(NULL));
+    shared_ptr<Image> noisy = make_shared<Image>(img.getHeight(), img.getWidth());
+    float random;
+
+    for(int i=0; i<img.getHeight(); i++)
+    {
+        for(int j=0; j<img.getWidth(); j++)
+        {
+            random = rand()%100;
+            if(random > 90)
+            {
+                noisy->setPixel(i,j,0);
+            }
+            else
+            {
+                noisy->setPixel(i,j,img.getPixel(i,j));
+            }
+        }
+    }
+    return noisy;
+}
+
+shared_ptr<Image> Image::changeBrightness(const Image& img, int dBright)
+{
+    shared_ptr<Image> bright = make_shared<Image>(img.getHeight(), img.getWidth());
+    float newPixel;
+
+    for(int i=0; i<img.getHeight(); i++)
+    {
+        for(int j=0; j<img.getWidth(); j++)
+        {
+            newPixel = img.getPixel(i,j) + dBright;
+            newPixel = min((float)255, max((float)0, newPixel));
+            bright->setPixel(i,j,newPixel);
+        }
+    }
+
+    return bright;
+}
+
+shared_ptr<Image> Image::changeContrast(const Image& img, float k)
+{
+    shared_ptr<Image> contrast = make_shared<Image>(img.getHeight(), img.getWidth());
+    float mid = 0;
+    float newPixel;
+    for(int i=0; i<img.getHeight(); i++)
+    {
+        for(int j=0; j<img.getWidth(); j++)
+        {
+            mid += img.getPixel(i,j);
+        }
+    }
+    mid /= img.getHeight() * img.getWidth();
+
+    for(int i=0; i<img.getHeight(); i++)
+    {
+        for(int j=0; j<img.getWidth(); j++)
+        {
+            newPixel = mid + k*(img.getPixel(i,j) - mid);
+            newPixel = min((float)255, max((float)0, newPixel));
+            contrast->setPixel(i,j,newPixel);
+        }
+    }
+    return contrast;
+}
+
 QImage Image::toQImage() const
 {
     QImage result = QImage(width, height, QImage::Format_RGB32);

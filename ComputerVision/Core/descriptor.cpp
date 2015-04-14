@@ -19,11 +19,19 @@ float Descriptor::distance(Descriptor d1, Descriptor d2)
 
 void Descriptor::normalize()
 {
-    float min = 0;
-    float max = 2;
+    float min = 2;
+    float max = 0;
     for(int i=0; i<buckets.size(); i++)
     {
-        buckets[i]= min(2, max(0, buckets[i]));
+        if(buckets[i] > 2)
+        {
+            buckets[i] = 2;
+        }
+        else if(buckets[i] < 0)
+        {
+            buckets[i] = 0;
+        }
+
         if(buckets[i] < min)
         {
             min = buckets[i];

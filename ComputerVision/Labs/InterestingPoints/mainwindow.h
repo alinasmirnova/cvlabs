@@ -21,6 +21,9 @@ public:
 private:
     Ui::MainWindow *ui;
     shared_ptr<Image> image;
+    QDir curFolder;
+
+    vector<Point> findPointsForImage(const Image& img, QString saveFolder, QString saveName);
 
 private slots:
     void chooseFile();

@@ -117,27 +117,35 @@ vector<Point> Detectors::Harris(const Image &image, int halfSizeW, int localMaxS
     auto L = make_shared<Image>(image.getHeight(),image.getWidth());
 
     float a,b,c;
-    float lambda1, lambda2, lambda;
-    float d;
+    float response;
+    //float weight;
+    vector<Point> points;
 
     for(int i=0; i<image.getHeight(); i++)
     {
         for(int j=0; j<image.getWidth(); j++)
         {
+//            a = 0;
+//            b = 0;
+//            c = 0;
+//            for(int dx = -halfSizeW; dx <= halfSizeW; dx++)
+//            {
+//                for(int dy = -halfSizeW; dy <= halfSizeW; dy++)
+//                {
+//                    weight = (pow(M_E,-(dx*dx + dy*dy)/(2*sigma*sigma)))/(2*M_PI*sigma*sigma);
+//                    a += weight * A->getPixel(i+dx, j+dy);
+//                    b += weight * B->getPixel(i+dx, j+dy);
+//                    c += weight * C->getPixel(i+dx, j+dy);
+//                }
+//            }
             a = A->getPixel(i,j);
             b = B->getPixel(i,j);
             c = C->getPixel(i,j);
 
-            d = sqrt(pow(a-c, 2) + 4*pow(b,2));
-            lambda1 = (a+c+d)/2;
-            lambda2 = (a+c-d)/2;
-
-            lambda = min(lambda1, lambda2) - 0.05*max(lambda1, lambda2);
-
-            L->setPixel(i,j,lambda);
+            response = a*b - c*c - 0.05*(a+b)*(a+b);
+            L->setPixel(i,j,response);
         }
     }
-
     return findLocalMax(*L, localMaxSize, bottom);
 }
 

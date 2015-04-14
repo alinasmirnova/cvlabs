@@ -30,21 +30,21 @@ void MainWindow::chooseFile()
             QWidget::setWindowTitle(fileNames[0]);
             image = Image::fromFile(fileNames[0]);
             ui->fileName->setText(fileNames[0]);
+            curFolder = dialog.directory();
         }
     }
 }
 
-void MainWindow::findPoints()
+vector<Point> MainWindow::findPointsForImage(const Image& img, QString saveFolder, QString saveName)
 {
-
     vector<Point> points;
     if(ui->algo->currentIndex() == 0)
     {
-        points = Detectors::Moravec(*image, ui->windowSize->value(), ui->localMax->value(), ui->minS->value());
+        points = Detectors::Moravec(img, ui->windowSize->value(), ui->localMax->value(), ui->minS->value());
     }
     else
     {
-        points = Detectors::Harris(*image, ui->windowSize->value(), ui->localMax->value(), ui->minS->value());
+        points = Detectors::Harris(img, ui->windowSize->value(), ui->localMax->value(), ui->minS->value());
     }
 
     if(ui->suppress->isChecked())
@@ -53,7 +53,7 @@ void MainWindow::findPoints()
         points = Detectors::AdaptiveNonMaximumSuppression(points, pointNum, max(image->getHeight(), image->getWidth()));
     }
 
-    QImage qImg = image->toQImage();
+    QImage qImg = img.toQImage();
     QPainter p(&qImg);
 
     p.setPen(QPen(QColor(Qt::red)));
@@ -64,8 +64,30 @@ void MainWindow::findPoints()
     }
 
     p.end();
+    if(!curFolder.exists(saveFolder))
+    {
+        curFolder.mkdir(saveFolder);
+    }
+    QString savePath = curFolder.absolutePath() + "/" + saveFolder + "/" + saveName;
+    qImg.save(savePath);
+    return points;
+}
 
-    qImg.save("E:\\Pictures\\1.jpg");
+void MainWindow::findPoints()
+{
+    findPointsForImage(*image, "points", "init.jpg");
+
+    shared_ptr<Image> shifted = FilterManager::Filter(*image, *MaskFactory::Shift(10,Direction::LEFT));
+    findPointsForImage(*shifted, "points", "shifted.jpg");
+
+    shared_ptr<Image> noisy = Image::getNoisy(*image);
+    findPointsForImage(*noisy, "points", "noisy.jpg");
+
+    shared_ptr<Image> bright = Image::changeBrightness(*image, 30);
+    findPointsForImage(*bright, "points", "bright.jpg");
+
+    shared_ptr<Image> contrast = Image::changeContrast(*image, 1.5);
+    findPointsForImage(*contrast, "points", "contrast.jpg");
 }
 
 MainWindow::~MainWindow()

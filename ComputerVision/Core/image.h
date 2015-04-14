@@ -5,6 +5,7 @@
 #include <QImage>
 #include <QtDebug>
 #include <math.h>
+#include <time.h>
 using namespace std;
 
 enum EdgeMode
@@ -21,6 +22,10 @@ public:
 
     static shared_ptr<Image> fromFile(const QString &fileName);
     static shared_ptr<Image> fromQImage(QImage picture);
+
+    static shared_ptr<Image> getNoisy(const Image& img);
+    static shared_ptr<Image> changeBrightness(const Image& img, int dBright);
+    static shared_ptr<Image> changeContrast(const Image& img, float k);
 
     QImage toQImage() const;
     bool toFile(const QString &fileName)const;
