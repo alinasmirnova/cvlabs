@@ -1,18 +1,27 @@
 #ifndef DESCRIPTOR_H
 #define DESCRIPTOR_H
+#include <memory>
 #include <math.h>
 #include <vector>
+#include <algorithm>
+#include <utility>
 using namespace std;
 
 class Descriptor
 {
-    vector<float> buckets;
+    vector<float> baskets;
 public:
-    Descriptor();
+    int x, y;
+
+    Descriptor(int basketNum, int x, int y);
 
     static float distance(Descriptor d1, Descriptor d2);
     void normalize();
+    void addInBasket(int basketNum, float value);
+
+    shared_ptr<Descriptor> findClosest(vector<shared_ptr<Descriptor>> descriptors);
+
     ~Descriptor();
 };
 
-#endif // DESCRIPTOR_H
+#endif

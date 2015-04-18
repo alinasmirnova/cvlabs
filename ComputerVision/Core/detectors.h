@@ -19,6 +19,7 @@ class Detectors
 {
     static vector<Point> findLocalMax(const Image &S, int localMaxSize, int halfSizeW, float bottom);
     static float findContrast(const Image &image, int x, int y, int dx, int dy, int halfSizeW);
+    static float GetDistance(Point p1, Point p2);
 public:
     Detectors();
 

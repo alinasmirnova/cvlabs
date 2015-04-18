@@ -132,7 +132,7 @@ vector<Point> Detectors::Harris(const Image &image, int halfSizeW, int localMaxS
     return findLocalMax(*L, localMaxSize, halfSizeW, bottom);
 }
 
-float GetDistance(Point p1, Point p2)
+float Detectors::GetDistance(Point p1, Point p2)
 {
     return sqrt(pow(p1.x - p2.x, 2) + pow(p1.y - p2.y, 2));
 }

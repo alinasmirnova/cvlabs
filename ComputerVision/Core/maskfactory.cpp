@@ -129,7 +129,7 @@ shared_ptr<Mask> MaskFactory::Shar(Asix asix)
 
 shared_ptr<Mask> MaskFactory::Gauss(float sigma)
 {
-    int k = 3*sigma;
+    int k = max(ceil(3*sigma),3.0f);
     int size = 2*k+1;
     shared_ptr<Mask> result = make_shared<Mask>(size,size);
     int x, y;
@@ -159,7 +159,7 @@ shared_ptr<SeparatedMask> MaskFactory::SobelSeparated(Asix asix)
     switch(asix)
     {
     case Asix::X:
-        static float row1[] = {-1,0,-1};
+        static float row1[] = {1,0,-1};
         static float column1 [] = {1,2,1};
         row = row1;
         column = column1;
