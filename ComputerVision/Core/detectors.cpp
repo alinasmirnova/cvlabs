@@ -27,9 +27,9 @@ vector<Point> Detectors::Moravec(const Image &image, int halfSizeW, int localMax
     Image S(image.getHeight(),image.getWidth());
     float C;
     float min;
-    for(int i=0; i<image.getHeight(); i++)
+    for(int i=halfSizeW; i<image.getHeight()-halfSizeW; i++)
     {
-        for(int j=0; j<image.getWidth(); j++)
+        for(int j=halfSizeW; j<image.getWidth()-halfSizeW; j++)
         {
             min = std::numeric_limits<float>::max();
             for(int dx = -1; dx<=1; dx++)
@@ -47,18 +47,18 @@ vector<Point> Detectors::Moravec(const Image &image, int halfSizeW, int localMax
         }
     }
 
-    return findLocalMax(S, localMaxSize, bottom);
+    return findLocalMax(S, localMaxSize, halfSizeW, bottom);
 }
 
-vector<Point> Detectors::findLocalMax(const Image &S, int localMaxSize, float bottom)
+vector<Point> Detectors::findLocalMax(const Image &S, int localMaxSize, int halfSizeW, float bottom)
 {
      vector<Point> points;
      bool isLocalMax;
      float pixelValue;
 
-     for(int i=0; i<S.getHeight(); i++)
+     for(int i=halfSizeW; i<S.getHeight()-halfSizeW; i++)
      {
-         for(int j=0; j<S.getWidth(); j++)
+         for(int j=halfSizeW; j<S.getWidth()-halfSizeW; j++)
          {
              isLocalMax = true;
              pixelValue = S.getPixel(i, j);
@@ -68,20 +68,17 @@ vector<Point> Detectors::findLocalMax(const Image &S, int localMaxSize, float bo
                  {
                      for(int dy = -localMaxSize; dy <= localMaxSize; dy++)
                      {
-                         if(pixelValue < S.getPixel(i + dx, j + dy))
+                         if(pixelValue <= S.getPixel(i + dx, j + dy) && !(dx==0 && dy == 0))
                          {
                              isLocalMax = false;
-                             break;
+                             goto exit;
                          }
-                     }
-                     if(!isLocalMax)
-                     {
-                         break;
-                     }
+                     }                     
                  }
-                 if(isLocalMax)
+exit:            if(isLocalMax)
                  {
-                     points.push_back(Point(j, i, pixelValue));
+                     //emplace_back
+                     points.emplace_back(j, i, pixelValue);
                  }
              }
          }
@@ -118,26 +115,12 @@ vector<Point> Detectors::Harris(const Image &image, int halfSizeW, int localMaxS
 
     float a,b,c;
     float response;
-    //float weight;
     vector<Point> points;
 
-    for(int i=0; i<image.getHeight(); i++)
+    for(int i=halfSizeW; i<image.getHeight()-halfSizeW; i++)
     {
-        for(int j=0; j<image.getWidth(); j++)
+        for(int j=halfSizeW; j<image.getWidth()-halfSizeW; j++)
         {
-//            a = 0;
-//            b = 0;
-//            c = 0;
-//            for(int dx = -halfSizeW; dx <= halfSizeW; dx++)
-//            {
-//                for(int dy = -halfSizeW; dy <= halfSizeW; dy++)
-//                {
-//                    weight = (pow(M_E,-(dx*dx + dy*dy)/(2*sigma*sigma)))/(2*M_PI*sigma*sigma);
-//                    a += weight * A->getPixel(i+dx, j+dy);
-//                    b += weight * B->getPixel(i+dx, j+dy);
-//                    c += weight * C->getPixel(i+dx, j+dy);
-//                }
-//            }
             a = A->getPixel(i,j);
             b = B->getPixel(i,j);
             c = C->getPixel(i,j);
@@ -146,7 +129,7 @@ vector<Point> Detectors::Harris(const Image &image, int halfSizeW, int localMaxS
             L->setPixel(i,j,response);
         }
     }
-    return findLocalMax(*L, localMaxSize, bottom);
+    return findLocalMax(*L, localMaxSize, halfSizeW, bottom);
 }
 
 float GetDistance(Point p1, Point p2)
@@ -179,7 +162,7 @@ vector<Point> Detectors::AdaptiveNonMaximumSuppression(const vector<Point> &poin
                 isMax = true;
                 for(uint j=0; j<sortedPoints.size(); j++)
                 {
-                    if(sortedPoints[i].contrast < sortedPoints[j].contrast && GetDistance(sortedPoints[i], sortedPoints[j]) < r)
+                    if(sortedPoints[i].contrast*0.9 < sortedPoints[j].contrast && GetDistance(sortedPoints[i], sortedPoints[j]) < r)
                     {
                         isMax = false;
                         break;

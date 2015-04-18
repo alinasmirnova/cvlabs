@@ -11,18 +11,13 @@ struct Point {
     int x;
     int y;
     float contrast;
-public:
-    Point(int x, int y, float c)
-    {
-        this->x = x;
-        this->y = y;
-        this->contrast = c;
-    }
+    Point(int x, int y, float c): x(x), y(y), contrast(c){}
+
 };
 
 class Detectors
 {
-    static vector<Point> findLocalMax(const Image &S, int localMaxSize, float bottom);
+    static vector<Point> findLocalMax(const Image &S, int localMaxSize, int halfSizeW, float bottom);
     static float findContrast(const Image &image, int x, int y, int dx, int dy, int halfSizeW);
 public:
     Detectors();

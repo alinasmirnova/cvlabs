@@ -47,18 +47,19 @@ shared_ptr<Image> Image::fromQImage(QImage picture)
 
 shared_ptr<Image> Image::getNoisy(const Image& img)
 {
-    srand(time(NULL));
     shared_ptr<Image> noisy = make_shared<Image>(img.getHeight(), img.getWidth());
-    float random;
-
+    mt19937 mt(1856);
+    uniform_int_distribution<int> dist(0,9);
+    uniform_int_distribution<int> dist1(0,255);
+    int random;
     for(int i=0; i<img.getHeight(); i++)
     {
         for(int j=0; j<img.getWidth(); j++)
         {
-            random = rand()%100;
-            if(random > 90)
+            random = dist(mt);
+            if(random > 7)
             {
-                noisy->setPixel(i,j,0);
+                noisy->setPixel(i,j,dist1(mt));
             }
             else
             {

@@ -38,6 +38,7 @@ void MainWindow::chooseFile()
 vector<Point> MainWindow::findPointsForImage(const Image& img, QString saveFolder, QString saveName)
 {
     vector<Point> points;
+
     if(ui->algo->currentIndex() == 0)
     {
         points = Detectors::Moravec(img, ui->windowSize->value(), ui->localMax->value(), ui->minS->value());
@@ -57,10 +58,10 @@ vector<Point> MainWindow::findPointsForImage(const Image& img, QString saveFolde
     QPainter p(&qImg);
 
     p.setPen(QPen(QColor(Qt::red)));
-    p.setBrush(QBrush(QColor(Qt::red)));
+    //p.setBrush(QBrush(QColor(Qt::red)));
 
     for(uint i=0; i<points.size(); i++) {
-        p.fillRect(points[i].x - 1, points[i].y - 1, 3, 3, QColor(Qt::red));
+        p.drawRect(points[i].x - 1, points[i].y - 1, 3, 3);
     }
 
     p.end();
@@ -75,19 +76,19 @@ vector<Point> MainWindow::findPointsForImage(const Image& img, QString saveFolde
 
 void MainWindow::findPoints()
 {
-    findPointsForImage(*image, "points", "init.jpg");
+    findPointsForImage(*image, "points", "init.png");
 
     shared_ptr<Image> shifted = FilterManager::Filter(*image, *MaskFactory::Shift(10,Direction::LEFT));
-    findPointsForImage(*shifted, "points", "shifted.jpg");
+    findPointsForImage(*shifted, "points", "shifted.png");
 
     shared_ptr<Image> noisy = Image::getNoisy(*image);
-    findPointsForImage(*noisy, "points", "noisy.jpg");
+    findPointsForImage(*noisy, "points", "noisy.png");
 
     shared_ptr<Image> bright = Image::changeBrightness(*image, 30);
-    findPointsForImage(*bright, "points", "bright.jpg");
+    findPointsForImage(*bright, "points", "bright.png");
 
     shared_ptr<Image> contrast = Image::changeContrast(*image, 1.5);
-    findPointsForImage(*contrast, "points", "contrast.jpg");
+    findPointsForImage(*contrast, "points", "contrast.png");
 }
 
 MainWindow::~MainWindow()
