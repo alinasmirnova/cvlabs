@@ -23,8 +23,6 @@ shared_ptr<Descriptor> DescriptorGenerator::getDescriptor(int x, int y, int surS
 {
     auto descriptor = make_shared<Descriptor>(basketNum*gistNum, x, y);
 
-    auto mask = MaskFactory::Gauss(surSize*1.0/6);
-
     int gistSize = ceil(surSize/gistNum);
     int curGistNum;
     float weight,angle;
@@ -34,6 +32,9 @@ shared_ptr<Descriptor> DescriptorGenerator::getDescriptor(int x, int y, int surS
 
     x -= surSize/2;
     y -= surSize/2;
+    float sigma = surSize*0.5;
+    int x1,y1;
+
     for(int i=0; i<gistNum; i++)
     {
         for(int j=0; j<gistNum; j++)
@@ -43,7 +44,10 @@ shared_ptr<Descriptor> DescriptorGenerator::getDescriptor(int x, int y, int surS
             {
                 for(int curY = j*gistSize; curY<(j+1)*gistSize && curY<surSize; curY++)
                 {
-                    weight = gradients->getPixel(y+curY, x+curX);//mask->getPixel(curY, curX)*gradients->getPixel(y+curY, x+curX);
+                    x1 = curX -surSize/2;
+                    y1 = curY - surSize/2;
+
+                    weight = gradients->getPixel(y+curY, x+curX)*(pow(M_E,-(x1*x1 + y1*y1)/(2*sigma*sigma)))/(2*M_PI*sigma*sigma);//mask->getPixel(curY, curX)*gradients->getPixel(y+curY, x+curX);
                     angle = angles->getPixel(y+curY, x+curX);
                     left = angle/oneBasket;
 
