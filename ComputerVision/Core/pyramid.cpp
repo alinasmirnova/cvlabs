@@ -32,6 +32,9 @@ shared_ptr<Pyramid> Pyramid::build(const Image &image, int octaveNum, int levelN
 
         shared_ptr<Image> next = FilterManager::SeparatedFilter(image, *MaskFactory::GaussSeparated(sqrt(sigma0*sigma0 - sigmaInit*sigmaInit)), true, EdgeMode::MIRROR);
 
+        shared_ptr<Image> nextDoG;
+        shared_ptr<Image> prev;
+
         float k = pow(2, 1./levelNum);
         float curSigma = sigma0;
         for(int i=0; i<octaveNum; i++)
@@ -40,7 +43,20 @@ shared_ptr<Pyramid> Pyramid::build(const Image &image, int octaveNum, int levelN
             {
                 result->images.push_back(make_unique<PyramidLevel>(next, i, j, curSigma));
                 curSigma = curSigma * k;
+                prev = next;
                 next = FilterManager::SeparatedFilter(*next, *MaskFactory::GaussSeparated(k), false, EdgeMode::MIRROR);
+
+                //find next level of DoG
+                nextDoG = make_shared<Image>(next->getHeight(), next->getWidth());
+                for(int i=0; i<nextDoG->getHeight(); i++)
+                {
+                    for(int j=0; j<nextDoG->getWidth(); j++)
+                    {
+                        nextDoG->setPixel(i,j,next->getPixel(i,j) - prev->getPixel(i,j));
+                    }
+                }
+                result->DoG.push_back(make_unique<PyramidLevel>(nextDoG, i, j, curSigma));
+                // ///////////////////////////////////////////////////////////////////////////////////
             }
             result->images.push_back(make_unique<PyramidLevel>(next, i, levelNum, curSigma));
             next = next->compress(2);
@@ -94,6 +110,24 @@ float Pyramid::findPixel(int i, int j, float sigma)
     qDebug() << "High sigma = " << hightSigma;
 
     return lowPixel + (highPixel - lowPixel)*(sigma - lowSigma)/(hightSigma - lowSigma);
+}
+
+float Pyramid::isLocalMaximaOrMinima(int x, int y)
+{
+     int scale;
+     int curX,curY;
+
+     for(int octave=octaveNum-1; octave>=0; octave--)
+     {
+         scale = pow(2,octave);
+         curX = x/scale;
+         curY = y/scale;
+         for(int level=levelsNum-1; level>=0; level--)
+         {
+
+         }
+     }
+     return 0;
 }
 
 Pyramid::~Pyramid()

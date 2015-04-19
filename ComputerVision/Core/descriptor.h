@@ -19,7 +19,7 @@ public:
     void normalize();
     void addInBasket(int basketNum, float value);
 
-    shared_ptr<Descriptor> findClosest(vector<shared_ptr<Descriptor>> descriptors);
+    shared_ptr<Descriptor> findClosest(vector<Descriptor> descriptors);
 
     ~Descriptor();
 };

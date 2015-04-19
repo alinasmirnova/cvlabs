@@ -14,7 +14,7 @@ class DescriptorGenerator
 public:
     DescriptorGenerator(const Image& image);
 
-    shared_ptr<Descriptor> getDescriptor(int x, int y, int surSize, int gistNum, int basketNum);
+    Descriptor getDescriptor(int x, int y, int surSize, int gistNum, int basketNum);
 
     ~DescriptorGenerator();
 };

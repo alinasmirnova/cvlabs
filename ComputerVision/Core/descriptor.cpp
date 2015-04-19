@@ -47,16 +47,13 @@ void Descriptor::addInBasket(int basketNum, float value)
     }
 }
 
-shared_ptr<Descriptor> Descriptor::findClosest(vector<shared_ptr<Descriptor>> descriptors)
+shared_ptr<Descriptor> Descriptor::findClosest(vector<Descriptor> descriptors)
 {
-    sort(begin(descriptors), end(descriptors), [this](auto a, auto b) {return distance(*this,*a) < distance(*this,*b);});
+    sort(begin(descriptors), end(descriptors), [this](auto a, auto b) {return distance(*this,a) < distance(*this,b);});
 
-    float d1 = distance(*this, *descriptors[0]);
-    float d2 = distance(*this, *descriptors[1]);
-
-    if(distance(*this, *descriptors[0]) / distance(*this, *descriptors[1]) < 0.8)
+    if(distance(*this, descriptors[0]) / distance(*this, descriptors[1]) < 0.8)
     {
-        return descriptors[0];
+        return make_shared<Descriptor>(descriptors[0]);
     }
     return nullptr;
 }

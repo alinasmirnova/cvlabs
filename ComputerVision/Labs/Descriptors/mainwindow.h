@@ -21,10 +21,15 @@ public:
 
 private:
     Ui::MainWindow *ui;
-    shared_ptr<Image> image;
+    shared_ptr<Image> img1;
+    shared_ptr<Image> img2;
     QDir curFolder;
 
-    vector<Point> findPointsForImage(const Image& img, QString saveFolder, QString saveName);
+    vector<Point> findPoints(const Image& img1);
+    vector<Descriptor> findDescriptors(const Image& img1, vector<Point> points);
+    QImage findAndDrawPairs(const Image& img1, const Image& img2,
+                    vector<Point> points1, vector<Point> points2,
+                    vector<Descriptor> desc1, vector<Descriptor> desc2);
 
 private slots:
     void chooseFile();

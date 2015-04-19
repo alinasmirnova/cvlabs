@@ -11,6 +11,7 @@ class Pyramid
     int octaveNum;
     int levelsNum;
     vector<unique_ptr<PyramidLevel>> images;
+    vector<unique_ptr<PyramidLevel>> DoG;
 
 public:
     Pyramid(int octaves, int levels);
@@ -20,6 +21,7 @@ public:
     static shared_ptr<Pyramid> build(const Image &image, int octaveNum, int levelNum, float sigma0 = 1, float sigmaInit = 0.5);
     float findPixel(int i, int j, float sigma);
 
+    float isLocalMaximaOrMinima(int x, int y);   //sigma = sigma0
     ~Pyramid();
 };
 

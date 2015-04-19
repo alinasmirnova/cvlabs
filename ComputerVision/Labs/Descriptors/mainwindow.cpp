@@ -24,72 +24,74 @@ void MainWindow::chooseFile()
         if(fileNames.length() > 0)
         {
             QWidget::setWindowTitle(fileNames[0]);
-            image = Image::fromFile(fileNames[0]);
+            img1 = Image::fromFile(fileNames[0]);
             ui->image->setText(fileNames[0]);
             curFolder = dialog.directory();
         }
     }
 }
 
-void MainWindow::findPoints()
+vector<Point> MainWindow::findPoints(const Image& image)
 {
-    //image = FilterManager::SeparatedFilter(*image, *MaskFactory::GaussSeparated(2));
-    shared_ptr<Image> noisy  = FilterManager::Filter(*image, *MaskFactory::Shift(10, Direction::DOWN));
-    noisy->toQImage().save("E:/1.png");
-    vector<shared_ptr<Descriptor>> desk1, desk2;
+    auto points1 = Detectors::Harris(image, 5, 5, 10);
+    return Detectors::AdaptiveNonMaximumSuppression(points1, 50, max(image.getHeight(), image.getWidth()));
+}
 
-    auto genFirst = make_shared<DescriptorGenerator>(*image);
-    auto genSecond = make_shared<DescriptorGenerator>(*noisy);
-
-    //find points for first image
-    qDebug() << "First";
-    auto points1 = Detectors::Harris(*image, 5, 5, 10);
-    points1 = Detectors::AdaptiveNonMaximumSuppression(points1, 50, max(image->getHeight(), image->getWidth()));
-
-    QImage img1 = image->toQImage();
-
-    for(int i=0; i<points1.size(); i++)
+vector<Descriptor> MainWindow::findDescriptors(const Image& image, vector<Point> points)
+{
+    vector<Descriptor> descriptors;
+    DescriptorGenerator generator(image);
+    for(int i=0; i<points.size(); i++)
     {
-       desk1.push_back(genFirst->getDescriptor(points1[i].x, points1[i].y, 16, 4, 8));
+       descriptors.push_back(generator.getDescriptor(points[i].x, points[i].y, 16, 4, 8));
     }
+    return descriptors;
+}
 
-    //find points for second image
-    qDebug() << "Second";
-    auto points2 = Detectors::Harris(*noisy, 5, 5, 10);
-    points2 = Detectors::AdaptiveNonMaximumSuppression(points2, 50, max(image->getHeight(), image->getWidth()));
-    QImage img2 = noisy->toQImage();
-
-    for(int i=0; i<points2.size(); i++)
-    {
-       desk2.push_back(genSecond->getDescriptor(points2[i].x, points2[i].y, 16, 4, 8));
-    }
-
-    qDebug() << "Drawing";
-    QImage result = QImage(image->getWidth()*2 + 1, image->getHeight(), img1.format());
+QImage MainWindow::findAndDrawPairs(const Image& img1, const Image& img2,
+                        vector<Point> points1, vector<Point> points2,
+                        vector<Descriptor> desc1, vector<Descriptor> desc2)
+{
+    QImage result = QImage(img1.getWidth()*2 + 1, img1.getHeight(), QImage::Format_RGB32);
     result.fill(0);
     QPainter painter(&result);
     painter.setPen(QPen(QColor(Qt::red)));
-    painter.drawImage(0,0,img1);
-    painter.drawImage(image->getWidth()+1, 0, img2);
+    painter.drawImage(0,0,img1.toQImage());
+    painter.drawImage(img1.getWidth()+1, 0, img2.toQImage());
 
     for(uint i=0; i<points1.size(); i++) {
         painter.drawRect(points1[i].x - 1, points1[i].y - 1, 3, 3);
     }
     for(uint i=0; i<points2.size(); i++) {
-        painter.drawRect(points2[i].x + image->getWidth(), points2[i].y, 3, 3);
+        painter.drawRect(points2[i].x + img1.getWidth(), points2[i].y, 3, 3);
     }
 
     shared_ptr<Descriptor> closest;
-    for(int i=0; i<desk1.size(); i++)
+    for(int i=0; i<desc1.size(); i++)
     {
-        closest = desk1[i]->findClosest(desk2);
+        closest = desc1[i].findClosest(desc2);
         if(closest != nullptr)
         {
-            painter.drawLine(QPoint(desk1[i]->x, desk1[i]->y), QPoint(closest->x + image->getWidth() + 1, closest->y));
+            painter.drawLine(QPoint(desc1[i].x, desc1[i].y), QPoint(closest->x + img1.getWidth() + 1, closest->y));
         }
     }
-
     painter.end();
+    return result;
+}
+
+
+void MainWindow::findPoints()
+{
+    //image = FilterManager::SeparatedFilter(*image, *MaskFactory::GaussSeparated(2));
+    img2  = FilterManager::Filter(*img1, *MaskFactory::Shift(10, Direction::DOWN));
+
+    auto points1 = findPoints(*img1);
+    auto points2 = findPoints(*img2);
+
+    auto desc1 = findDescriptors(*img1, points1);
+    auto desc2 = findDescriptors(*img2, points2);
+
+    auto result = findAndDrawPairs(*img1, *img2, points1, points2, desc1, desc2);
 
     QString savePath = curFolder.absolutePath() + "/descriptors/1.png";
     result.save(savePath);

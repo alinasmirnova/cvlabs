@@ -19,9 +19,9 @@ DescriptorGenerator::DescriptorGenerator(const Image& image)
     }
 }
 
-shared_ptr<Descriptor> DescriptorGenerator::getDescriptor(int x, int y, int surSize, int gistNum, int basketNum)
+Descriptor DescriptorGenerator::getDescriptor(int x, int y, int surSize, int gistNum, int basketNum)
 {
-    auto descriptor = make_shared<Descriptor>(basketNum*gistNum, x, y);
+    Descriptor descriptor(basketNum*gistNum, x, y);
 
     int gistSize = ceil(surSize/gistNum);
     int curGistNum;
@@ -53,14 +53,14 @@ shared_ptr<Descriptor> DescriptorGenerator::getDescriptor(int x, int y, int surS
 
                     leftValue = weight*(angle - left*oneBasket)/(oneBasket);
 
-                    descriptor->addInBasket(curGistNum*basketNum + left, leftValue);
-                    descriptor->addInBasket(curGistNum*basketNum + left + 1, weight - leftValue);
+                    descriptor.addInBasket(curGistNum*basketNum + left, leftValue);
+                    descriptor.addInBasket(curGistNum*basketNum + left + 1, weight - leftValue);
                 }
             }
         }
     }
 
-    descriptor->normalize();
+    descriptor.normalize();
     return descriptor;
 }
 
