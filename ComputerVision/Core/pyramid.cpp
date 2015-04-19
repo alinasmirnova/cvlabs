@@ -27,40 +27,56 @@ shared_ptr<Pyramid> Pyramid::build(const Image &image, int octaveNum, int levelN
     if(octaveNum > 0 && levelNum > 0)
     {
         shared_ptr<Pyramid> result = make_shared<Pyramid>(octaveNum, levelNum);
-
-        result->images.push_back(make_unique<PyramidLevel>(Image::fromQImage(image.toQImage()), 0, -1, sigmaInit));
-
-        shared_ptr<Image> next = FilterManager::SeparatedFilter(image, *MaskFactory::GaussSeparated(sqrt(sigma0*sigma0 - sigmaInit*sigmaInit)), true, EdgeMode::MIRROR);
-
-        shared_ptr<Image> nextDoG;
-        shared_ptr<Image> prev;
+        shared_ptr<Image> next, top1, top2;
 
         float k = pow(2, 1./levelNum);
+        sigma0 = sigma0 / k;
         float curSigma = sigma0;
+        float bottomSigma = sigma0;
+        auto octaveBottom = FilterManager::SeparatedFilter(image, *MaskFactory::GaussSeparated(sqrt(sigma0*sigma0 - sigmaInit*sigmaInit)), false, EdgeMode::MIRROR);
+
         for(int i=0; i<octaveNum; i++)
         {
+            result->images.push_back(make_shared<PyramidLevel>(octaveBottom, i, -1, bottomSigma));
+            next = octaveBottom;
+
             for(int j=0; j<levelNum; j++)
             {
-                result->images.push_back(make_unique<PyramidLevel>(next, i, j, curSigma));
-                curSigma = curSigma * k;
-                prev = next;
+                curSigma *= k;
                 next = FilterManager::SeparatedFilter(*next, *MaskFactory::GaussSeparated(k), false, EdgeMode::MIRROR);
+                result->images.push_back(make_shared<PyramidLevel>(next, i, j, curSigma));
+            }
 
-                //find next level of DoG
-                nextDoG = make_shared<Image>(next->getHeight(), next->getWidth());
-                for(int i=0; i<nextDoG->getHeight(); i++)
+            octaveBottom = next->compress(2);
+            bottomSigma = curSigma;
+
+            top1 = FilterManager::SeparatedFilter(*next, *MaskFactory::GaussSeparated(k), false, EdgeMode::MIRROR);
+            result->images.push_back(make_shared<PyramidLevel>(top1, i, levelNum, curSigma*k));
+
+            top2 = FilterManager::SeparatedFilter(*top1, *MaskFactory::GaussSeparated(k), false, EdgeMode::MIRROR);
+            result->images.push_back(make_shared<PyramidLevel>(top2, i, levelNum + 1, curSigma*k*k));
+        }
+
+        shared_ptr<Image> DoG;
+        shared_ptr<Image> top, bottom;
+        for(int i=0; i<result->images.size()-1; i++)
+        {
+            if(result->images[i]->getOctave() == result->images[i+1]->getOctave())
+            {
+                top = result->images[i+1]->getImage();
+                bottom = result->images[i]->getImage();
+                DoG = make_shared<Image>(top->getHeight(), top->getWidth());
+                for(int y=0; y<DoG->getHeight(); y++)
                 {
-                    for(int j=0; j<nextDoG->getWidth(); j++)
+                    for(int x = 0; x<DoG->getWidth(); x++)
                     {
-                        nextDoG->setPixel(i,j,next->getPixel(i,j) - prev->getPixel(i,j));
+                        DoG->setPixel(y,x,top->getPixel(y,x) - bottom->getPixel(y,x));
                     }
                 }
-                result->DoG.push_back(make_unique<PyramidLevel>(nextDoG, i, j, curSigma));
-                // ///////////////////////////////////////////////////////////////////////////////////
+                result->DoG.push_back(make_shared<PyramidLevel>(DoG, result->images[i]->getOctave(), result->images[i]->getLevel(), result->images[i]->getSigma()));
             }
-            result->images.push_back(make_unique<PyramidLevel>(next, i, levelNum, curSigma));
-            next = next->compress(2);
         }
+
         return result;
     }
     else
@@ -112,19 +128,50 @@ float Pyramid::findPixel(int i, int j, float sigma)
     return lowPixel + (highPixel - lowPixel)*(sigma - lowSigma)/(hightSigma - lowSigma);
 }
 
-float Pyramid::isLocalMaximaOrMinima(int x, int y)
+float Pyramid::isLocalMaximaOrMinima(int x, int y) const
 {
      int scale;
      int curX,curY;
+     int maxThen;
+     int minThen;
+     float curValue;
 
-     for(int octave=octaveNum-1; octave>=0; octave--)
+     for(int i=1; i < DoG.size() - 1; i++)
      {
-         scale = pow(2,octave);
+         if(DoG[i+1]->getOctave() != DoG[i]->getOctave() && DoG[i]->getOctave() != DoG[i-1]->getOctave())
+         {
+             continue;
+         }
+
+         maxThen = minThen = 0;
+         scale = pow(2, DoG[i]->getOctave());
          curX = x/scale;
          curY = y/scale;
-         for(int level=levelsNum-1; level>=0; level--)
-         {
+         curValue = DoG[i]->getImage()->getPixel(curY, curX);
 
+         for(int dx = -1; dx<=1; dx++)
+         {
+             for(int dy = -1; dy<=1; dy++)
+             {
+                 for(int img=-1; img<=1; img++)
+                 {
+                     if(curValue > DoG[i+img]->getImage()->getPixel(curY+dy, curX+dx))
+                     {
+                         maxThen++;
+                         if(minThen > 0) goto exit;
+                     }
+                     else if(curValue < DoG[i+img]->getImage()->getPixel(curY+dy, curX+dx))
+                     {
+                         minThen++;
+                         if(maxThen > 0) goto exit;
+                     }
+                 }
+             }
+         }
+
+exit:    if(minThen == 0 || maxThen == 0)
+         {
+             return curValue = DoG[i]->getSigma();
          }
      }
      return 0;
@@ -135,3 +182,25 @@ Pyramid::~Pyramid()
 
 }
 
+
+shared_ptr<PyramidLevel> Pyramid::getLevel(float sigma) const
+{
+    for(int i=0; i<images.size(); i++)
+    {
+        if(sigma == images[i]->getSigma() && images[i]->getLevel() > -1 && images[i]->getLevel() < levelsNum)
+        {
+            return images[i];
+        }
+    }
+    return nullptr;
+}
+
+Descriptor Pyramid::getDescriptor(Point p, int surSize, int gistNum, int basketNum) const
+{
+    auto level = getLevel(p.scale);
+    int scale = pow(2,level->getOctave());
+    Point p1(p.x/scale, p.y/scale, p.contrast, p.scale);
+    auto desk = level->getGenerator()->getDescriptor(p1, surSize, gistNum, basketNum);
+    desk.point = p;
+    return desk;
+}

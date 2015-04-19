@@ -8,5 +8,7 @@
 #include "pyramid.h"
 #include "detectors.h"
 #include "descriptorgenerator.h"
+#include "point.h"
+#include "descriptor.h"
 #endif
 

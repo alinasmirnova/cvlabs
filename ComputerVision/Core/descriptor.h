@@ -5,15 +5,16 @@
 #include <vector>
 #include <algorithm>
 #include <utility>
+#include "point.h"
 using namespace std;
 
 class Descriptor
 {
     vector<float> baskets;
 public:
-    int x, y;
+    Point point;
 
-    Descriptor(int basketNum, int x, int y);
+    Descriptor(int basketNum, Point p);
 
     static float distance(Descriptor d1, Descriptor d2);
     void normalize();

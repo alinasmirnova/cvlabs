@@ -31,7 +31,8 @@ HEADERS += image.h \
     pyramidlevel.h \
     detectors.h \
     descriptorgenerator.h \
-    descriptor.h
+    descriptor.h \
+    point.h
 unix {
     target.path = /usr/lib
     INSTALLS += target

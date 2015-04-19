@@ -78,7 +78,7 @@ vector<Point> Detectors::findLocalMax(const Image &S, int localMaxSize, int half
 exit:            if(isLocalMax)
                  {
                      //emplace_back
-                     points.emplace_back(j, i, pixelValue);
+                     points.emplace_back(j, i, pixelValue,0);
                  }
              }
          }
@@ -132,7 +132,7 @@ vector<Point> Detectors::Harris(const Image &image, int halfSizeW, int localMaxS
     return findLocalMax(*L, localMaxSize, halfSizeW, bottom);
 }
 
-float Detectors::GetDistance(Point p1, Point p2)
+float Detectors::getDistance(Point p1, Point p2)
 {
     return sqrt(pow(p1.x - p2.x, 2) + pow(p1.y - p2.y, 2));
 }
@@ -162,7 +162,7 @@ vector<Point> Detectors::AdaptiveNonMaximumSuppression(const vector<Point> &poin
                 isMax = true;
                 for(uint j=0; j<sortedPoints.size(); j++)
                 {
-                    if(sortedPoints[i].contrast*0.9 < sortedPoints[j].contrast && GetDistance(sortedPoints[i], sortedPoints[j]) < r)
+                    if(sortedPoints[i].contrast*0.9 < sortedPoints[j].contrast && getDistance(sortedPoints[i], sortedPoints[j]) < r)
                     {
                         isMax = false;
                         break;
@@ -179,6 +179,23 @@ vector<Point> Detectors::AdaptiveNonMaximumSuppression(const vector<Point> &poin
                     }
                 }
             }
+        }
+    }
+    return result;
+}
+
+vector<Point> Detectors::ScaleInvariant(const Image &image, const Pyramid& pyramid, int halfSizeW, int localMaxSize, float bottom)
+{
+    auto points = Harris(image, halfSizeW, localMaxSize, bottom);
+    float scale;
+    vector<Point> result;
+    for(int i=0; i<points.size(); i++)
+    {
+        scale = pyramid.isLocalMaximaOrMinima(points[i].x, points[i].y);
+        if(scale > 0)
+        {
+            points[i].scale = scale;
+            result.push_back(points[i]);
         }
     }
     return result;

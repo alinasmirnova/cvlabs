@@ -1,13 +1,12 @@
 #include "descriptor.h"
 
-Descriptor::Descriptor(int basketNum, int x, int y)
+Descriptor::Descriptor(int basketNum, Point p)
 {
     for(int i=0; i<basketNum; i++)
     {
         baskets.push_back(0);
     }
-    this->x = x;
-    this->y = y;
+    this->point = p;
 }
 
 float Descriptor::distance(Descriptor d1, Descriptor d2)
@@ -26,6 +25,20 @@ void Descriptor::normalize()
 {
     float minValue = numeric_limits<float>::max();
     float maxValue = 0;
+    for(int i=0; i<baskets.size(); i++)
+    {
+        //baskets[i] = max(0.0f, min(2.0f, baskets[i]));
+        minValue = min(minValue, baskets[i]);
+        maxValue = max(maxValue, baskets[i]);
+    }
+
+    for(int i=0; i<baskets.size(); i++)
+    {
+        baskets[i] = min((baskets[i] - minValue)/(maxValue - minValue), 0.2f);
+    }
+
+    minValue = numeric_limits<float>::max();
+    maxValue = 0;
     for(int i=0; i<baskets.size(); i++)
     {
         //baskets[i] = max(0.0f, min(2.0f, baskets[i]));

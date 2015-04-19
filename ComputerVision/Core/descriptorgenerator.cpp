@@ -19,9 +19,9 @@ DescriptorGenerator::DescriptorGenerator(const Image& image)
     }
 }
 
-Descriptor DescriptorGenerator::getDescriptor(int x, int y, int surSize, int gistNum, int basketNum)
+Descriptor DescriptorGenerator::getDescriptor(Point p, int surSize, int gistNum, int basketNum)
 {
-    Descriptor descriptor(basketNum*gistNum, x, y);
+    Descriptor descriptor(basketNum*gistNum, p);
 
     int gistSize = ceil(surSize/gistNum);
     int curGistNum;
@@ -30,8 +30,8 @@ Descriptor DescriptorGenerator::getDescriptor(int x, int y, int surSize, int gis
     int left;
     float leftValue;
 
-    x -= surSize/2;
-    y -= surSize/2;
+    int x = p.x - surSize/2;
+    int y = p.y - surSize/2;
     float sigma = surSize*0.5;
     int x1,y1;
 

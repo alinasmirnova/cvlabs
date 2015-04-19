@@ -6,25 +6,22 @@
 #include <utility>
 #include "filtermanager.h"
 #include "maskfactory.h"
-
-struct Point {
-    int x;
-    int y;
-    float contrast;
-    Point(int x, int y, float c): x(x), y(y), contrast(c){}
-
-};
+#include "pyramid.h"
+#include "point.h"
 
 class Detectors
 {
     static vector<Point> findLocalMax(const Image &S, int localMaxSize, int halfSizeW, float bottom);
     static float findContrast(const Image &image, int x, int y, int dx, int dy, int halfSizeW);
-    static float GetDistance(Point p1, Point p2);
+    static float getDistance(Point p1, Point p2);
 public:
     Detectors();
 
     static vector<Point> Moravec(const Image &image, int halfSizeW, int localMaxSize, float bottom);
     static vector<Point> Harris(const Image &image, int halfSizeW, int localMaxSize, float bottom);
+
+    static vector<Point> ScaleInvariant(const Image &image, const Pyramid& pyramid, int halfSizeW, int localMaxSize, float bottom);
+
     static vector<Point> AdaptiveNonMaximumSuppression(const vector<Point> &points, int maxPointNum, int maxR);
     ~Detectors();
 };
