@@ -186,16 +186,23 @@ vector<Point> Detectors::AdaptiveNonMaximumSuppression(const vector<Point> &poin
 
 vector<Point> Detectors::ScaleInvariant(const Image &image, const Pyramid& pyramid, int halfSizeW, int localMaxSize, float bottom)
 {
-    auto points = Harris(image, halfSizeW, localMaxSize, bottom);
-    float scale;
     vector<Point> result;
-    for(int i=0; i<points.size(); i++)
+    vector<Point> points;
+    shared_ptr<PyramidLevel> pLevel;
+    for(int octave=0; octave<pyramid.octaveNum; octave++)
     {
-        scale = pyramid.isLocalMaximaOrMinima(points[i].x, points[i].y);
-        if(scale > 0)
+        for(int level=0; level<pyramid.levelsNum; level++)
         {
-            points[i].scale = scale;
-            result.push_back(points[i]);
+            pLevel = pyramid.getLevel(octave,level);
+            points = Harris(*pLevel->getImage(),halfSizeW, localMaxSize, bottom);
+            for(int i=0; i<points.size(); i++)
+            {
+                points[i].scale = pLevel->getSigma();
+                if(pyramid.isLocalMaximaOrMinima(points[i].x, points[i].y, points[i].scale))
+                {
+                    result.push_back(points[i]);
+                }
+            }
         }
     }
     return result;

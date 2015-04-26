@@ -26,14 +26,14 @@ private:
     QDir curFolder;
 
     vector<Point> findPoints(const Image& image);
-    vector<Descriptor> findDescriptors(const Image& image, vector<Point> points);
+    vector<shared_ptr<Descriptor>> findDescriptors(const Image& image, vector<Point> points);
 
     vector<Point> findScaledPoints(const Image& image, const Pyramid &pyramid);
-    vector<Descriptor> findScaledDescriptors(vector<Point> points, const Pyramid &pyramid);
+    vector<shared_ptr<Descriptor>> findScaledDescriptors(vector<Point> points, const Pyramid &pyramid);
 
     QImage findAndDrawPairs(const Image& img1, const Image& img2,
                     vector<Point> points1, vector<Point> points2,
-                    vector<Descriptor> desc1, vector<Descriptor> desc2);
+                    vector<shared_ptr<Descriptor> > desc1, vector<shared_ptr<Descriptor> > desc2);
 
 private slots:
     void chooseFile();

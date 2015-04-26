@@ -5,7 +5,7 @@ DescriptorGenerator::DescriptorGenerator(const Image& image)
     auto dx = FilterManager::SeparatedFilter(image, *MaskFactory::SobelSeparated(Asix::X), false, EdgeMode::MIRROR);
     auto dy = FilterManager::SeparatedFilter(image, *MaskFactory::SobelSeparated(Asix::Y), false, EdgeMode::MIRROR);
 
-    gradients = make_unique<Image>(image.getHeight(), image.getWidth());
+    magnitudes = make_unique<Image>(image.getHeight(), image.getWidth());
     angles = make_unique<Image>(image.getHeight(), image.getWidth());
 
     for(int i=0; i<image.getHeight(); i++)
@@ -14,14 +14,14 @@ DescriptorGenerator::DescriptorGenerator(const Image& image)
         {
             angles->setPixel(i,j,atan2(dy->getPixel(i,j), dx->getPixel(i, j))*180/M_PI + 180);
 
-            gradients->setPixel(i, j, sqrt(pow(dx->getPixel(i,j),2) + pow(dx->getPixel(i,j),2)));
+            magnitudes->setPixel(i, j, sqrt(pow(dx->getPixel(i,j),2) + pow(dx->getPixel(i,j),2)));
         }
     }
 }
 
-Descriptor DescriptorGenerator::getDescriptor(Point p, int surSize, int gistNum, int basketNum)
+shared_ptr<Descriptor> DescriptorGenerator::getDescriptor(Point p, int surSize, int gistNum, int basketNum)
 {
-    Descriptor descriptor(basketNum*gistNum, p);
+    auto descriptor = make_shared<Descriptor>(basketNum*gistNum, p);
 
     int gistSize = ceil(surSize/gistNum);
     int curGistNum;
@@ -47,20 +47,20 @@ Descriptor DescriptorGenerator::getDescriptor(Point p, int surSize, int gistNum,
                     x1 = curX -surSize/2;
                     y1 = curY - surSize/2;
 
-                    weight = gradients->getPixel(y+curY, x+curX)*(pow(M_E,-(x1*x1 + y1*y1)/(2*sigma*sigma)))/(2*M_PI*sigma*sigma);//mask->getPixel(curY, curX)*gradients->getPixel(y+curY, x+curX);
+                    weight = magnitudes->getPixel(y+curY, x+curX)*(pow(M_E,-(x1*x1 + y1*y1)/(2*sigma*sigma)))/(2*M_PI*sigma*sigma);//mask->getPixel(curY, curX)*gradients->getPixel(y+curY, x+curX);
                     angle = angles->getPixel(y+curY, x+curX);
                     left = angle/oneBasket;
 
-                    leftValue = weight*(angle - left*oneBasket)/(oneBasket);
+                    leftValue = weight*(angle - left*oneBasket + oneBasket/2)/(oneBasket);
 
-                    descriptor.addInBasket(curGistNum*basketNum + left, leftValue);
-                    descriptor.addInBasket(curGistNum*basketNum + left + 1, weight - leftValue);
+                    descriptor->addInBean(curGistNum*basketNum + left, leftValue);
+                    descriptor->addInBean(curGistNum*basketNum + (left + 1)%basketNum, weight - leftValue);
                 }
             }
         }
     }
 
-    descriptor.normalize();
+    descriptor->normalize();
     return descriptor;
 }
 

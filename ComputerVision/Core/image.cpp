@@ -57,7 +57,7 @@ shared_ptr<Image> Image::getNoisy(const Image& img)
         for(int j=0; j<img.getWidth(); j++)
         {
             random = dist(mt);
-            if(random > 7)
+            if(random > 8)
             {
                 noisy->setPixel(i,j,dist1(mt));
             }

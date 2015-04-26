@@ -128,53 +128,46 @@ float Pyramid::findPixel(int i, int j, float sigma)
     return lowPixel + (highPixel - lowPixel)*(sigma - lowSigma)/(hightSigma - lowSigma);
 }
 
-float Pyramid::isLocalMaximaOrMinima(int x, int y) const
+bool Pyramid::isLocalMaximaOrMinima(int x, int y, float scale) const
 {
-     int scale;
      int curX,curY;
      int maxThen;
      int minThen;
      float curValue;
 
-     for(int i=1; i < DoG.size() - 1; i++)
+     for(int i=DoG.size() - 2; i > 0; i--)
      {
-         if(DoG[i+1]->getOctave() != DoG[i]->getOctave() && DoG[i]->getOctave() != DoG[i-1]->getOctave())
+         if(DoG[i]->getSigma() == scale && DoG[i+1]->getOctave() == DoG[i]->getOctave() && DoG[i]->getOctave() == DoG[i-1]->getOctave())
          {
-             continue;
-         }
+             maxThen = minThen = 0;
+             scale = pow(2, DoG[i]->getOctave());
+             curX = x/scale;
+             curY = y/scale;
+             curValue = DoG[i]->getImage()->getPixel(curY, curX);
 
-         maxThen = minThen = 0;
-         scale = pow(2, DoG[i]->getOctave());
-         curX = x/scale;
-         curY = y/scale;
-         curValue = DoG[i]->getImage()->getPixel(curY, curX);
-
-         for(int dx = -1; dx<=1; dx++)
-         {
-             for(int dy = -1; dy<=1; dy++)
+             for(int dx = -1; dx<=1; dx++)
              {
-                 for(int img=-1; img<=1; img++)
+                 for(int dy = -1; dy<=1; dy++)
                  {
-                     if(curValue > DoG[i+img]->getImage()->getPixel(curY+dy, curX+dx))
+                     for(int img=-1; img<=1; img++)
                      {
-                         maxThen++;
-                         if(minThen > 0) goto exit;
-                     }
-                     else if(curValue < DoG[i+img]->getImage()->getPixel(curY+dy, curX+dx))
-                     {
-                         minThen++;
-                         if(maxThen > 0) goto exit;
+                         if(curValue > DoG[i+img]->getImage()->getPixel(curY+dy, curX+dx))
+                         {
+                             maxThen++;
+                             if(minThen > 0) return false;
+                         }
+                         else if(curValue < DoG[i+img]->getImage()->getPixel(curY+dy, curX+dx))
+                         {
+                             minThen++;
+                             if(maxThen > 0) return false;
+                         }
                      }
                  }
              }
-         }
-
-exit:    if(minThen == 0 || maxThen == 0)
-         {
-             return curValue = DoG[i]->getSigma();
+             return true;
          }
      }
-     return 0;
+     return false;
 }
 
 Pyramid::~Pyramid()
@@ -195,12 +188,23 @@ shared_ptr<PyramidLevel> Pyramid::getLevel(float sigma) const
     return nullptr;
 }
 
-Descriptor Pyramid::getDescriptor(Point p, int surSize, int gistNum, int basketNum) const
+shared_ptr<PyramidLevel> Pyramid::getLevel(int octave, int level) const
+{
+    for(int i=0; i<images.size(); i++)
+    {
+        if(octave == images[i]->getOctave() && level == images[i]->getLevel())
+        {
+            return images[i];
+        }
+    }
+    return nullptr;
+}
+shared_ptr<Descriptor> Pyramid::getDescriptor(Point p, int surSize, int gistNum, int basketNum) const
 {
     auto level = getLevel(p.scale);
     int scale = pow(2,level->getOctave());
     Point p1(p.x/scale, p.y/scale, p.contrast, p.scale);
     auto desk = level->getGenerator()->getDescriptor(p1, surSize, gistNum, basketNum);
-    desk.point = p;
+    desk->point = p;
     return desk;
 }

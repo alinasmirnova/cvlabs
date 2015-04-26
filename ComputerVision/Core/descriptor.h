@@ -10,17 +10,20 @@ using namespace std;
 
 class Descriptor
 {
-    vector<float> baskets;
+    unique_ptr<float[]> beans;
+    int beansNum;
+
+    void simpleNormalize();
 public:
     Point point;
 
-    Descriptor(int basketNum, Point p);
+    Descriptor(int beansNum, Point p);
 
-    static float distance(Descriptor d1, Descriptor d2);
+    static float distance(const Descriptor& d1, const Descriptor& d2);
     void normalize();
-    void addInBasket(int basketNum, float value);
+    void addInBean(int beanNum, float value);
 
-    shared_ptr<Descriptor> findClosest(vector<Descriptor> descriptors);
+    int findClosest(vector<shared_ptr<Descriptor> > descriptors);
 
     ~Descriptor();
 };

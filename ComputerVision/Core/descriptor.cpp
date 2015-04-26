@@ -1,74 +1,79 @@
 #include "descriptor.h"
 
-Descriptor::Descriptor(int basketNum, Point p)
+Descriptor::Descriptor(int beansNum, Point p): beansNum(beansNum), point(p)
 {
-    for(int i=0; i<basketNum; i++)
-    {
-        baskets.push_back(0);
-    }
-    this->point = p;
+    beans = make_unique<float[]>(beansNum);
 }
 
-float Descriptor::distance(Descriptor d1, Descriptor d2)
+float Descriptor::distance(const Descriptor& d1, const Descriptor& d2)
 {
     float distance = 0;
 
-    for(int i=0; i<d1.baskets.size(); i++)
+    for(int i=0; i<d1.beansNum; i++)
     {
-        distance += pow(d1.baskets[i] - d2.baskets[i], 2);
+        distance += pow(d1.beans[i] - d2.beans[i], 2);
     }
 
     return sqrt(distance);
 }
 
+void Descriptor::simpleNormalize()
+{
+    auto m = minmax_element(&beans[0], &beans[beansNum]);;
+    float minValue = *m.first;
+    float maxValue = *m.second;
+
+    for(int i=0; i<beansNum; i++)
+    {
+        beans[i] = (beans[i] - minValue)/(maxValue - minValue);
+    }
+}
+
 void Descriptor::normalize()
 {
-    float minValue = numeric_limits<float>::max();
-    float maxValue = 0;
-    for(int i=0; i<baskets.size(); i++)
+    simpleNormalize();
+    for(int i = 0; i<beansNum; i++)
     {
-        //baskets[i] = max(0.0f, min(2.0f, baskets[i]));
-        minValue = min(minValue, baskets[i]);
-        maxValue = max(maxValue, baskets[i]);
+        beans[i] = min(beans[i], 0.2f);
     }
+    simpleNormalize();
+}
 
-    for(int i=0; i<baskets.size(); i++)
+void Descriptor::addInBean(int beanNum, float value)
+{
+    if(beanNum >= 0 && beanNum < beansNum)
     {
-        baskets[i] = min((baskets[i] - minValue)/(maxValue - minValue), 0.2f);
-    }
-
-    minValue = numeric_limits<float>::max();
-    maxValue = 0;
-    for(int i=0; i<baskets.size(); i++)
-    {
-        //baskets[i] = max(0.0f, min(2.0f, baskets[i]));
-        minValue = min(minValue, baskets[i]);
-        maxValue = max(maxValue, baskets[i]);
-    }
-
-    for(int i=0; i<baskets.size(); i++)
-    {
-        baskets[i] = (baskets[i] - minValue)/(maxValue - minValue);
+        beans[beanNum] += value;
     }
 }
 
-void Descriptor::addInBasket(int basketNum, float value)
+int Descriptor::findClosest(vector<shared_ptr<Descriptor>> descriptors)
 {
-    if(basketNum > 0 && basketNum < (int)baskets.size())
-    {
-        baskets[basketNum] += value;
-    }
-}
+    int minIndex1 = -1, minIndex2 = -1;
+    float minValue1 = numeric_limits<float>::max(), minValue2 = numeric_limits<float>::max(), value;
 
-shared_ptr<Descriptor> Descriptor::findClosest(vector<Descriptor> descriptors)
-{
-    sort(begin(descriptors), end(descriptors), [this](auto a, auto b) {return distance(*this,a) < distance(*this,b);});
-
-    if(distance(*this, descriptors[0]) / distance(*this, descriptors[1]) < 0.8)
+    for(int i=0; i<descriptors.size(); i++)
     {
-        return make_shared<Descriptor>(descriptors[0]);
+        value = distance(*this, *descriptors[i]);
+        if(value < minValue1)
+        {
+            minValue2 = minValue1;
+            minIndex2 = minIndex1;
+
+            minValue1 = value;
+            minIndex1 = i;
+        }
+        else if(value < minValue2)
+        {
+            minValue2 = value;
+            minIndex2 = i;
+        }
     }
-    return nullptr;
+    if(minValue1 / minValue2 < 0.8)
+    {
+        return minIndex1;
+    }
+    return -1;
 }
 
 Descriptor::~Descriptor()

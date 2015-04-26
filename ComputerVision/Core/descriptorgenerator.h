@@ -9,12 +9,12 @@ using namespace std;
 
 class DescriptorGenerator
 {
-    unique_ptr<Image> gradients;
+    unique_ptr<Image> magnitudes;
     unique_ptr<Image> angles;
 public:
     DescriptorGenerator(const Image& image);
 
-    Descriptor getDescriptor(Point p, int surSize, int gistNum, int basketNum);
+    shared_ptr<Descriptor> getDescriptor(Point p, int surSize, int gistNum, int basketNum);
 
     ~DescriptorGenerator();
 };
