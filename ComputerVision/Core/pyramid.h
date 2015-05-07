@@ -24,6 +24,8 @@ public:
 
     bool isLocalMaximaOrMinima(int x, int y, float scale) const;
 
+    vector<Point> findLocalMaximaAndMinima() const;
+
     shared_ptr<PyramidLevel> getLevel(float sigma) const;
     shared_ptr<PyramidLevel> getLevel(int octave, int level) const;
     shared_ptr<Descriptor> getDescriptor(Point p, int surSize, int gistNum, int basketNum) const;

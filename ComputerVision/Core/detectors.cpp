@@ -189,21 +189,25 @@ vector<Point> Detectors::ScaleInvariant(const Image &image, const Pyramid& pyram
     vector<Point> result;
     vector<Point> points;
     shared_ptr<PyramidLevel> pLevel;
-    for(int octave=0; octave<pyramid.octaveNum; octave++)
-    {
-        for(int level=0; level<pyramid.levelsNum; level++)
-        {
-            pLevel = pyramid.getLevel(octave,level);
-            points = Harris(*pLevel->getImage(),halfSizeW, localMaxSize, bottom);
-            for(int i=0; i<points.size(); i++)
-            {
-                points[i].scale = pLevel->getSigma();
-                if(pyramid.isLocalMaximaOrMinima(points[i].x, points[i].y, points[i].scale))
-                {
-                    result.push_back(points[i]);
-                }
-            }
-        }
-    }
+//    for(int octave=0; octave<pyramid.octaveNum; octave++)
+//    {
+//        for(int level=0; level<pyramid.levelsNum; level++)
+//        {
+//            pLevel = pyramid.getLevel(octave,level);
+//            points = Harris(*pLevel->getImage(),halfSizeW * pLevel->getSigma(), localMaxSize, bottom);
+//            for(int i=0; i<points.size(); i++)
+//            {
+//                points[i].scale = pLevel->getSigma();
+//                if(pyramid.isLocalMaximaOrMinima(points[i].x, points[i].y, points[i].scale))
+//                {
+//                    result.push_back(points[i]);
+//                }
+//            }
+//        }
+//    }
+    result = pyramid.findLocalMaximaAndMinima();
+    qDebug() << result.size();
+
+
     return result;
 }

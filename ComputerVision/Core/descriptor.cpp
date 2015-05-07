@@ -19,13 +19,16 @@ float Descriptor::distance(const Descriptor& d1, const Descriptor& d2)
 
 void Descriptor::simpleNormalize()
 {
-    auto m = minmax_element(&beans[0], &beans[beansNum]);;
-    float minValue = *m.first;
-    float maxValue = *m.second;
+    float lenght = 0;
 
     for(int i=0; i<beansNum; i++)
     {
-        beans[i] = (beans[i] - minValue)/(maxValue - minValue);
+        lenght += pow(beans[i], 2);
+    }
+
+    for(int i=0; i<beansNum; i++)
+    {
+        beans[i] = beans[i] / sqrt(lenght);
     }
 }
 

@@ -14,10 +14,11 @@ bool Pyramid::saveToFolder(const QString &folderName)
     }
     QString fileName;
     bool result = true;
-    for(uint i=0; i<images.size(); i++)
+    for(uint i=0; i<DoG.size(); i++)
     {
-        fileName = "Octave" + QString::number(images[i]->getOctave()) + "Level" + QString::number(images[i]->getLevel()) + "Sigma" + QString::number(images[i]->getSigma());
-        result = result && images[i]->getImage()->toFile(folderName + "/" + fileName + ".jpg");
+        fileName = "Octave" + QString::number(DoG[i]->getOctave()) + "Level" + QString::number(DoG[i]->getLevel()) + "Sigma" + QString::number(DoG[i]->getSigma());
+        //result = result && images[i]->getImage()->toFile(folderName + "/" + fileName + ".jpg");
+        result = result && DoG[i]->getImage()->toFile(folderName + "/D" + fileName + ".jpg");
     }
     return result;
 }
@@ -86,6 +87,7 @@ shared_ptr<Pyramid> Pyramid::build(const Image &image, int octaveNum, int levelN
     }
 }
 
+//координаты в оригинальном изображении. ищем для масштаба sigma
 float Pyramid::findPixel(int i, int j, float sigma)
 {
     if(sigma <= images[0]->getSigma())
@@ -128,46 +130,212 @@ float Pyramid::findPixel(int i, int j, float sigma)
     return lowPixel + (highPixel - lowPixel)*(sigma - lowSigma)/(hightSigma - lowSigma);
 }
 
+//координаты точки на масштабе scale
 bool Pyramid::isLocalMaximaOrMinima(int x, int y, float scale) const
 {
-     int curX,curY;
-     int maxThen;
-     int minThen;
-     float curValue;
+//    int octaveNum = floor(log(scale)/log(2));
+//    int curScale = pow(2, octaveNum);
+//    int xInit = x * curScale;
+//    int yInit = y * curScale;
+//    int curX, curY, maxThen, minThen;
+//    bool isMaxMin = false;
+//    bool localResult = false;
+//    float curValue;
 
-     for(int i=DoG.size() - 2; i > 0; i--)
-     {
-         if(DoG[i]->getSigma() == scale && DoG[i+1]->getOctave() == DoG[i]->getOctave() && DoG[i]->getOctave() == DoG[i-1]->getOctave())
-         {
-             maxThen = minThen = 0;
-             scale = pow(2, DoG[i]->getOctave());
-             curX = x/scale;
-             curY = y/scale;
-             curValue = DoG[i]->getImage()->getPixel(curY, curX);
+//    for(int i=DoG.size() - 2; i > 0; i--)
+//    {
+//        if(DoG[i+1]->getSigma() < scale) break;
+//        if(DoG[i+1]->getOctave() == DoG[i]->getOctave() && DoG[i]->getOctave() == DoG[i-1]->getOctave())
+//        {
+//            curScale = pow(2, DoG[i]->getOctave());
+//            curX = xInit/curScale;
+//            curY = yInit/curScale;
+//            curValue = DoG[i]->getImage()->getPixel(curY, curX);
+//            maxThen = minThen = 0;
+//            for(int dx = -1; dx<=1; dx++)
+//            {
+//                for(int dy = -1; dy<=1; dy++)
+//                {
+//                    for(int img=-1; img<=1; img++)
+//                    {
+//                        if(curValue > DoG[i+img]->getImage()->getPixel(curY+dy, curX+dx))
+//                        {
+//                            maxThen++;
+//                            if(minThen > 0) {
+//                                localResult = false;
+//                                goto exit;
+//                            }
+//                        }
+//                        else if(curValue < DoG[i+img]->getImage()->getPixel(curY+dy, curX+dx))
+//                        {
+//                            minThen++;
+//                            if(maxThen > 0) {
+//                                localResult = false;
+//                                goto exit;
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//            localResult = true;
+//        }
+//        exit: if(localResult)
+//        {
+//            //if(isMaxMin) return false;
+//            isMaxMin = true;
+//        }
+//    }
+//    return isMaxMin;
 
-             for(int dx = -1; dx<=1; dx++)
-             {
-                 for(int dy = -1; dy<=1; dy++)
-                 {
-                     for(int img=-1; img<=1; img++)
-                     {
-                         if(curValue > DoG[i+img]->getImage()->getPixel(curY+dy, curX+dx))
-                         {
-                             maxThen++;
-                             if(minThen > 0) return false;
-                         }
-                         else if(curValue < DoG[i+img]->getImage()->getPixel(curY+dy, curX+dx))
-                         {
-                             minThen++;
-                             if(maxThen > 0) return false;
-                         }
-                     }
-                 }
-             }
-             return true;
-         }
-     }
-     return false;
+//        vector<Point> result;
+
+//        int curX, curY, maxThen, minThen;
+//        bool isMaxMin = false;
+//        bool localResult = true;
+//        float curValue;
+//        float val;
+//        for(int i=DoG.size() - 2; i > 0; i--)
+//        {
+//            if(DoG[i+1]->getOctave() == DoG[i]->getOctave() && DoG[i]->getOctave() == DoG[i-1]->getOctave())
+//            {
+//                for(int curX = 1; curX < DoG[i]->getImage()->getWidth()-1; curX++)
+//                {
+//                    for(int curY = 1; curY < DoG[i]->getImage()->getHeight()-1; curY++)
+//                    {
+//                        localResult = true;
+//                        curValue = DoG[i]->getImage()->getPixel(curY, curX);
+//                        maxThen = 0; minThen = 0;
+//                        for(int dx = -1; dx<=1; dx++)
+//                        {
+//                            for(int dy = -1; dy<=1; dy++)
+//                            {
+//                                for(int img=-1; img<=1; img++)
+//                                {
+//                                    if(dx == 0 && dy == 0 && img == 0) continue;
+//                                    val = DoG[i+img]->getImage()->getPixel(curY+dy, curX+dx);
+//                                    if(curValue >= val)
+//                                    {
+//                                        maxThen++;
+//                                        if(minThen > 0) {
+//                                            localResult = false;
+//                                        }
+//                                    }
+//                                    else if(curValue < val)
+//                                    {
+//                                        minThen++;
+//                                        if(maxThen > 0) {
+//                                            localResult = false;
+//                                        }
+//                                    }
+//                                }
+//                            }
+//                        }
+//                        if(localResult){
+//                            result.push_back(Point(curX, curY, 0, DoG[i]->getSigma()));
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//        qDebug() <<result.size();
+//        return isMaxMin;
+//     int curX,curY;
+//     int maxThen;
+//     int minThen;
+//     float curValue;
+
+//     for(int i=DoG.size() - 2; i > 0; i--)
+//     {
+//         if(DoG[i]->getSigma() == scale && DoG[i+1]->getOctave() == DoG[i]->getOctave() && DoG[i]->getOctave() == DoG[i-1]->getOctave())
+//         {
+//             maxThen = minThen = 0;
+//             curX = x;
+//             curY = y;
+//             curValue = DoG[i]->getImage()->getPixel(curY, curX);
+
+//             for(int dx = -1; dx<=1; dx++)
+//             {
+//                 for(int dy = -1; dy<=1; dy++)
+//                 {
+//                     for(int img=-1; img<=1; img++)
+//                     {
+//                         if(curValue > DoG[i+img]->getImage()->getPixel(curY+dy, curX+dx))
+//                         {
+//                             maxThen++;
+//                             if(minThen > 0) return false;
+//                         }
+//                         else if(curValue < DoG[i+img]->getImage()->getPixel(curY+dy, curX+dx))
+//                         {
+//                             minThen++;
+//                             if(maxThen > 0) return false;
+//                         }
+//                     }
+//                 }
+//             }
+//             return true;
+//         }
+//     }
+//     return false;
+}
+
+vector<Point> Pyramid::findLocalMaximaAndMinima() const
+{
+    vector<Point> result;
+
+    float curValue, value;
+    bool isLocalMaxMin;
+    int more, less;
+    int octaveNum, curScale;
+
+    for(int dog = 1; dog < DoG.size() - 1; dog++)
+    {
+        for(int x = 1; x < DoG[dog]->getImage()->getWidth(); x++)
+        {
+            for(int y = 1; y < DoG[dog]->getImage()->getHeight(); y++)
+            {
+                curValue = DoG[dog]->getImage()->getPixel(y, x);
+                isLocalMaxMin = true;
+                more = 0;
+                less = 0;
+                for(int dNum = -1; dNum <= 1; dNum++)
+                {
+                    for(int dx = -1; dx <= 1; dx++)
+                    {
+                        for(int dy = -1; dy <= 1; dy++)
+                        {
+                            if(dNum == 0 && dx == 0 && dy == 0) continue;
+
+                            value = DoG[dog + dNum]->getImage()->getPixel(y + dy, x + dx);
+                            if(curValue > value)
+                            {
+                                more++;
+                                if(less > 0)
+                                {
+                                    isLocalMaxMin = false;
+                                    goto exit;
+                                }
+                            }
+                            else if(curValue < value)
+                            {
+                                less++;
+                                if(more > 0)
+                                {
+                                    isLocalMaxMin = false;
+                                    goto exit;
+                                }
+                            }
+                        }
+                    }
+                }
+                exit: if(isLocalMaxMin)
+                {
+                    curScale = pow(2, DoG[dog]->getOctave());
+                    result.push_back(Point(x*curScale, y*curScale, curValue, DoG[dog]->getSigma()));
+                }
+            }
+        }
+    }
+    return result;
 }
 
 Pyramid::~Pyramid()
