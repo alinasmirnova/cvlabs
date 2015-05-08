@@ -175,7 +175,7 @@ vector<Point> Pyramid::findLocalMaximaAndMinima(int halfWindow) const
             for(int y = border; y < DoG[dog]->getImage()->getHeight()-border; y++)
             {                
                 curValue = DoG[dog]->getImage()->getPixel(y, x);
-                if(fabs(curValue) < 8) continue;
+                if(fabs(curValue) < 6) continue;
 
                 isLocalMaxMin = true;
                 more = 0;
@@ -333,6 +333,9 @@ shared_ptr<Descriptor> Pyramid::getDescriptor(Point p, int surSize, int gistNum,
     auto level = getLevel(p.scale);
     int scale = pow(2,level->getOctave());
     Point p1(p.x/scale, p.y/scale, p.contrast, p.scale);
+    //find point angle
+    auto gist = level->getGenerator()->getDescriptor(p1, surSize, 1, 36);
+
     auto desk = level->getGenerator()->getDescriptor(p1, surSize, gistNum, basketNum);
     desk->point = p;
     return desk;

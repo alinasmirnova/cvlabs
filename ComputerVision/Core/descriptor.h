@@ -23,6 +23,8 @@ public:
     void normalize();
     void addInBean(int beanNum, float value);
 
+    tuple<int,int> getMaxBeanIndex();
+
     int findClosest(vector<shared_ptr<Descriptor> > descriptors);
 
     ~Descriptor();

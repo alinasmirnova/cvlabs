@@ -21,9 +21,12 @@ DescriptorGenerator::DescriptorGenerator(const Image& image)
 
 shared_ptr<Descriptor> DescriptorGenerator::getDescriptor(Point p, int surSize, int gistNum, int beansNum)
 {
-    auto descriptor = make_shared<Descriptor>(beansNum*gistNum, p);
+    //find point angle
 
-    int gistSize = ceil(surSize*p.scale/gistNum);
+    auto descriptor = make_shared<Descriptor>(beansNum*gistNum, p);
+    surSize = surSize*p.scale;
+
+    int gistSize = ceil(surSize/gistNum);
     int curGistNum;
     float weight,angle;
     float oneBasket = 360 / beansNum;

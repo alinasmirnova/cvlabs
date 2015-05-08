@@ -79,6 +79,15 @@ int Descriptor::findClosest(vector<shared_ptr<Descriptor>> descriptors)
     return -1;
 }
 
+tuple<int,int> Descriptor::getMaxBeanIndex()
+{
+    float max, maxNext;
+
+
+
+    return make_tuple(max,maxNext);
+}
+
 Descriptor::~Descriptor()
 {
 

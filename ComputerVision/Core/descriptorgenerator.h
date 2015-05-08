@@ -5,6 +5,7 @@
 #include "maskfactory.h"
 #include "descriptor.h"
 #include <vector>
+
 using namespace std;
 
 class DescriptorGenerator

@@ -201,11 +201,6 @@ vector<Point> Detectors::ScaleInvariant(const Image &image, const Pyramid& pyram
 //        }
 //    }
 
-
-
-    //уточняем координаты для каждой точки
-
-    //удаление точек на краях
     qDebug() << result.size();
     return result;
 }
