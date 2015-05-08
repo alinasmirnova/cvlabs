@@ -61,9 +61,11 @@ QImage MainWindow::findAndDrawPairs(const Image& img1, const Image& img2,
 
     for(uint i=0; i<points1.size(); i++) {
         painter.drawRect(points1[i].x - 1, points1[i].y - 1, 3, 3);
+    //    painter.drawEllipse(QPoint(points1[i].x, points1[i].y), points1[i].scale*8, points1[i].scale*8);
     }
     for(uint i=0; i<points2.size(); i++) {
         painter.drawRect(points2[i].x + img1.getWidth(), points2[i].y, 3, 3);
+    //    painter.drawEllipse(QPoint(points2[i].x, points2[i].y), points2[i].scale*8, points2[i].scale*8);
     }
 
     shared_ptr<Descriptor> closest;
@@ -74,6 +76,7 @@ QImage MainWindow::findAndDrawPairs(const Image& img1, const Image& img2,
         if(closestNum != -1)
         {
             closest = desc2[closestNum];
+            painter.setPen(QPen(QColor(rand()%255, rand()%255, rand()%255)));
             painter.drawLine(QPoint(desc1[i]->point.x, desc1[i]->point.y), QPoint(closest->point.x + img1.getWidth() + 1, closest->point.y));
         }
     }
@@ -83,8 +86,8 @@ QImage MainWindow::findAndDrawPairs(const Image& img1, const Image& img2,
 
 vector<Point> MainWindow::findScaledPoints(const Image& image, const Pyramid& pyramid)
 {
-    auto points = Detectors::ScaleInvariant(image, pyramid, 5, 5, 10);
-    return Detectors::AdaptiveNonMaximumSuppression(points, 200, max(image.getHeight(), image.getWidth()));
+    auto points = Detectors::ScaleInvariant(image, pyramid, 8);
+    return points;//Detectors::AdaptiveNonMaximumSuppression(points, 200, max(image.getHeight(), image.getWidth()));
 }
 
 vector<shared_ptr<Descriptor>> MainWindow::findScaledDescriptors(vector<Point> points, const Pyramid& pyramid)
@@ -99,35 +102,38 @@ vector<shared_ptr<Descriptor>> MainWindow::findScaledDescriptors(vector<Point> p
 
 void MainWindow::findPoints()
 {
-    //img2 = Image::fromFile("E:/Pictures/examples/scaled.png");
+    img2 = Image::fromFile("E:/Pictures/examples/scaled.png");
     //img2  = FilterManager::Filter(*img1, *MaskFactory::Shift(10, Direction::DOWN));
     //img2 = Image::getNoisy(*img1);
-    img2 = Image::changeBrightness(*img1, 30);
-    //lab4
-    auto points1 = findPoints(*img1);
-    auto points2 = findPoints(*img2);
+    //img2 = Image::changeBrightness(*img1, 30);
 
-    auto desc1 = findDescriptors(*img1, points1);
-    auto desc2 = findDescriptors(*img2, points2);
+    //lab4
+//    auto points1 = findPoints(*img1);
+//    auto points2 = findPoints(*img2);
+
+//    auto desc1 = findDescriptors(*img1, points1);
+//    auto desc2 = findDescriptors(*img2, points2);
 
     //lab5
-//    qDebug()<<"First pyramid";
-//    auto pyramid1 = Pyramid::build(*img1, 3, 5);
-//    pyramid1->saveToFolder("E:/Pictures/1");
-//    qDebug()<<"Second pyramid";
-//    auto pyramid2 = Pyramid::build(*img2, 3, 5);
+    qDebug()<<"First pyramid";
+    auto pyramid1 = Pyramid::build(*img1, 5, 5);
+    pyramid1->saveToFolder("E:/Pictures/1");
+    qDebug()<<"Second pyramid";
+    auto pyramid2 = Pyramid::build(*img2, 5, 5);
 
-//    qDebug()<<"First points";
-//    auto points1 = findScaledPoints(*img1, *pyramid1);
-//    qDebug()<<"Second points";
-//    auto points2 = findScaledPoints(*img2, *pyramid2);
+    qDebug()<<"First points";
+    auto points1 = findScaledPoints(*img1, *pyramid1);
+    qDebug()<<"Second points";
+    auto points2 = findScaledPoints(*img2, *pyramid2);
 
-//    qDebug()<<"First descriptors";
-//    auto desc1 = findScaledDescriptors(points1, *pyramid1);
-//    qDebug()<<"Second descriptors";
-//    auto desc2 = findScaledDescriptors(points2, *pyramid2);
+    qDebug()<<"First descriptors";
+    auto desc1 = findScaledDescriptors(points1, *pyramid1);
+    qDebug()<<"Second descriptors";
+    auto desc2 = findScaledDescriptors(points2, *pyramid2);
 
     qDebug()<<"Drawing";
+
+
     auto result = findAndDrawPairs(*img1, *img2, points1, points2, desc1, desc2);
 
     QString savePath = curFolder.absolutePath() + "/descriptors/1.png";

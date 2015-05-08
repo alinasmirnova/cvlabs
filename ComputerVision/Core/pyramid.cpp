@@ -35,27 +35,39 @@ shared_ptr<Pyramid> Pyramid::build(const Image &image, int octaveNum, int levelN
         float curSigma = sigma0;
         float bottomSigma = sigma0;
         auto octaveBottom = FilterManager::SeparatedFilter(image, *MaskFactory::GaussSeparated(sqrt(sigma0*sigma0 - sigmaInit*sigmaInit)), false, EdgeMode::MIRROR);
+        curSigma *= k;
+
+        float innerSigma = 1;
+
 
         for(int i=0; i<octaveNum; i++)
         {
-            result->images.push_back(make_shared<PyramidLevel>(octaveBottom, i, -1, bottomSigma));
+            innerSigma = 1;
+            result->images.push_back(make_shared<PyramidLevel>(octaveBottom, i, -1, bottomSigma, innerSigma));
             next = octaveBottom;
+            curSigma = bottomSigma;
 
             for(int j=0; j<levelNum; j++)
             {
+                next = FilterManager::SeparatedFilter(*next, *MaskFactory::GaussSeparated(curSigma*sqrt(k*k-1)), false, EdgeMode::MIRROR);
                 curSigma *= k;
-                next = FilterManager::SeparatedFilter(*next, *MaskFactory::GaussSeparated(k), false, EdgeMode::MIRROR);
-                result->images.push_back(make_shared<PyramidLevel>(next, i, j, curSigma));
+                innerSigma *= k;
+                result->images.push_back(make_shared<PyramidLevel>(next, i, j, curSigma, innerSigma));
             }
 
             octaveBottom = next->compress(2);
             bottomSigma = curSigma;
 
-            top1 = FilterManager::SeparatedFilter(*next, *MaskFactory::GaussSeparated(k), false, EdgeMode::MIRROR);
-            result->images.push_back(make_shared<PyramidLevel>(top1, i, levelNum, curSigma*k));
 
-            top2 = FilterManager::SeparatedFilter(*top1, *MaskFactory::GaussSeparated(k), false, EdgeMode::MIRROR);
-            result->images.push_back(make_shared<PyramidLevel>(top2, i, levelNum + 1, curSigma*k*k));
+            top1 = FilterManager::SeparatedFilter(*next, *MaskFactory::GaussSeparated(curSigma*sqrt(k*k-1)), false, EdgeMode::MIRROR);
+            curSigma *= k;
+            innerSigma *= k;
+            result->images.push_back(make_shared<PyramidLevel>(top1, i, levelNum, curSigma, innerSigma));
+
+            top2 = FilterManager::SeparatedFilter(*top1, *MaskFactory::GaussSeparated(curSigma*sqrt(k*k-1)), false, EdgeMode::MIRROR);
+            curSigma *= k;
+            innerSigma *= k;
+            result->images.push_back(make_shared<PyramidLevel>(top2, i, levelNum + 1, curSigma, innerSigma));
         }
 
         shared_ptr<Image> DoG;
@@ -74,7 +86,7 @@ shared_ptr<Pyramid> Pyramid::build(const Image &image, int octaveNum, int levelN
                         DoG->setPixel(y,x,top->getPixel(y,x) - bottom->getPixel(y,x));
                     }
                 }
-                result->DoG.push_back(make_shared<PyramidLevel>(DoG, result->images[i]->getOctave(), result->images[i]->getLevel(), result->images[i]->getSigma()));
+                result->DoG.push_back(make_shared<PyramidLevel>(DoG, result->images[i]->getOctave(), result->images[i]->getLevel(), result->images[i]->getSigma(), result->images[i]->getInnerSigma()));
             }
         }
 
@@ -130,155 +142,7 @@ float Pyramid::findPixel(int i, int j, float sigma)
     return lowPixel + (highPixel - lowPixel)*(sigma - lowSigma)/(hightSigma - lowSigma);
 }
 
-//координаты точки на масштабе scale
-bool Pyramid::isLocalMaximaOrMinima(int x, int y, float scale) const
-{
-//    int octaveNum = floor(log(scale)/log(2));
-//    int curScale = pow(2, octaveNum);
-//    int xInit = x * curScale;
-//    int yInit = y * curScale;
-//    int curX, curY, maxThen, minThen;
-//    bool isMaxMin = false;
-//    bool localResult = false;
-//    float curValue;
-
-//    for(int i=DoG.size() - 2; i > 0; i--)
-//    {
-//        if(DoG[i+1]->getSigma() < scale) break;
-//        if(DoG[i+1]->getOctave() == DoG[i]->getOctave() && DoG[i]->getOctave() == DoG[i-1]->getOctave())
-//        {
-//            curScale = pow(2, DoG[i]->getOctave());
-//            curX = xInit/curScale;
-//            curY = yInit/curScale;
-//            curValue = DoG[i]->getImage()->getPixel(curY, curX);
-//            maxThen = minThen = 0;
-//            for(int dx = -1; dx<=1; dx++)
-//            {
-//                for(int dy = -1; dy<=1; dy++)
-//                {
-//                    for(int img=-1; img<=1; img++)
-//                    {
-//                        if(curValue > DoG[i+img]->getImage()->getPixel(curY+dy, curX+dx))
-//                        {
-//                            maxThen++;
-//                            if(minThen > 0) {
-//                                localResult = false;
-//                                goto exit;
-//                            }
-//                        }
-//                        else if(curValue < DoG[i+img]->getImage()->getPixel(curY+dy, curX+dx))
-//                        {
-//                            minThen++;
-//                            if(maxThen > 0) {
-//                                localResult = false;
-//                                goto exit;
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-//            localResult = true;
-//        }
-//        exit: if(localResult)
-//        {
-//            //if(isMaxMin) return false;
-//            isMaxMin = true;
-//        }
-//    }
-//    return isMaxMin;
-
-//        vector<Point> result;
-
-//        int curX, curY, maxThen, minThen;
-//        bool isMaxMin = false;
-//        bool localResult = true;
-//        float curValue;
-//        float val;
-//        for(int i=DoG.size() - 2; i > 0; i--)
-//        {
-//            if(DoG[i+1]->getOctave() == DoG[i]->getOctave() && DoG[i]->getOctave() == DoG[i-1]->getOctave())
-//            {
-//                for(int curX = 1; curX < DoG[i]->getImage()->getWidth()-1; curX++)
-//                {
-//                    for(int curY = 1; curY < DoG[i]->getImage()->getHeight()-1; curY++)
-//                    {
-//                        localResult = true;
-//                        curValue = DoG[i]->getImage()->getPixel(curY, curX);
-//                        maxThen = 0; minThen = 0;
-//                        for(int dx = -1; dx<=1; dx++)
-//                        {
-//                            for(int dy = -1; dy<=1; dy++)
-//                            {
-//                                for(int img=-1; img<=1; img++)
-//                                {
-//                                    if(dx == 0 && dy == 0 && img == 0) continue;
-//                                    val = DoG[i+img]->getImage()->getPixel(curY+dy, curX+dx);
-//                                    if(curValue >= val)
-//                                    {
-//                                        maxThen++;
-//                                        if(minThen > 0) {
-//                                            localResult = false;
-//                                        }
-//                                    }
-//                                    else if(curValue < val)
-//                                    {
-//                                        minThen++;
-//                                        if(maxThen > 0) {
-//                                            localResult = false;
-//                                        }
-//                                    }
-//                                }
-//                            }
-//                        }
-//                        if(localResult){
-//                            result.push_back(Point(curX, curY, 0, DoG[i]->getSigma()));
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//        qDebug() <<result.size();
-//        return isMaxMin;
-//     int curX,curY;
-//     int maxThen;
-//     int minThen;
-//     float curValue;
-
-//     for(int i=DoG.size() - 2; i > 0; i--)
-//     {
-//         if(DoG[i]->getSigma() == scale && DoG[i+1]->getOctave() == DoG[i]->getOctave() && DoG[i]->getOctave() == DoG[i-1]->getOctave())
-//         {
-//             maxThen = minThen = 0;
-//             curX = x;
-//             curY = y;
-//             curValue = DoG[i]->getImage()->getPixel(curY, curX);
-
-//             for(int dx = -1; dx<=1; dx++)
-//             {
-//                 for(int dy = -1; dy<=1; dy++)
-//                 {
-//                     for(int img=-1; img<=1; img++)
-//                     {
-//                         if(curValue > DoG[i+img]->getImage()->getPixel(curY+dy, curX+dx))
-//                         {
-//                             maxThen++;
-//                             if(minThen > 0) return false;
-//                         }
-//                         else if(curValue < DoG[i+img]->getImage()->getPixel(curY+dy, curX+dx))
-//                         {
-//                             minThen++;
-//                             if(maxThen > 0) return false;
-//                         }
-//                     }
-//                 }
-//             }
-//             return true;
-//         }
-//     }
-//     return false;
-}
-
-vector<Point> Pyramid::findLocalMaximaAndMinima() const
+vector<Point> Pyramid::findLocalMaximaAndMinima(int halfWindow) const
 {
     vector<Point> result;
 
@@ -286,14 +150,33 @@ vector<Point> Pyramid::findLocalMaximaAndMinima() const
     bool isLocalMaxMin;
     int more, less;
     int octaveNum, curScale;
+    int border;
+    float trace, det;
+
+    shared_ptr<Image> dxx, dyy, dxy;
 
     for(int dog = 1; dog < DoG.size() - 1; dog++)
     {
-        for(int x = 1; x < DoG[dog]->getImage()->getWidth(); x++)
+        if(DoG[dog-1]->getOctave() != DoG[dog]->getOctave() || DoG[dog+1]->getOctave() != DoG[dog]->getOctave())
+            continue;
+
+        dxx = FilterManager::SeparatedFilter(*DoG[dog]->getImage(), *MaskFactory::SobelSeparated(Asix::X));
+        dyy = FilterManager::SeparatedFilter(*DoG[dog]->getImage(), *MaskFactory::SobelSeparated(Asix::Y));
+
+        dxy = FilterManager::SeparatedFilter(*dxx, *MaskFactory::SobelSeparated(Asix::Y));
+        dyy = FilterManager::SeparatedFilter(*dyy, *MaskFactory::SobelSeparated(Asix::Y));
+        dxx = FilterManager::SeparatedFilter(*dxx, *MaskFactory::SobelSeparated(Asix::X));
+
+
+        border = halfWindow*DoG[dog]->getSigma();
+
+        for(int x = border; x < DoG[dog]->getImage()->getWidth()-border; x++)
         {
-            for(int y = 1; y < DoG[dog]->getImage()->getHeight(); y++)
-            {
+            for(int y = border; y < DoG[dog]->getImage()->getHeight()-border; y++)
+            {                
                 curValue = DoG[dog]->getImage()->getPixel(y, x);
+                if(fabs(curValue) < 8) continue;
+
                 isLocalMaxMin = true;
                 more = 0;
                 less = 0;
@@ -329,11 +212,89 @@ vector<Point> Pyramid::findLocalMaximaAndMinima() const
                 }
                 exit: if(isLocalMaxMin)
                 {
-                    curScale = pow(2, DoG[dog]->getOctave());
-                    result.push_back(Point(x*curScale, y*curScale, curValue, DoG[dog]->getSigma()));
+                    curScale = pow(2,DoG[dog]->getOctave());
+
+                    //удаление точек на краях
+                    trace = dxx->getPixel(y,x) + dyy->getPixel(y,x);
+                    det = dxx->getPixel(y,x) * dyy->getPixel(y,x) - pow(dxy->getPixel(y,x),2);
+
+                    if(pow(trace,2) / det <= pow(11,2)/10)
+                    {
+                        result.push_back(Point(x*curScale, y*curScale, curValue, DoG[dog]->getInnerSigma()));
+                    }
                 }
             }
         }
+    }
+    return result;
+}
+
+
+vector<Point> Pyramid::isLocalMaximaAndMinima(int x, int y) const
+{
+    vector<Point> result;
+
+    float curValue, value;
+    bool isLocalMaxMin;
+    int more, less;
+    int octaveNum, curScale;
+
+    int curX, curY;
+
+    for(int dog = 1; dog < DoG.size() - 1; dog++)
+    {
+        if(DoG[dog-1]->getOctave() != DoG[dog]->getOctave() || DoG[dog+1]->getOctave() != DoG[dog]->getOctave())
+            continue;
+
+        curX = x/pow(2, DoG[dog]->getOctave());
+        curY = y/pow(2, DoG[dog]->getOctave());
+
+        if(fabs(curX - DoG[dog]->getImage()->getWidth()) < 16*DoG[dog]->getSigma() ||
+           fabs(curY - DoG[dog]->getImage()->getHeight()) < 16*DoG[dog]->getSigma())
+            continue;
+
+        curValue = DoG[dog]->getImage()->getPixel(curY, curX);
+        if(fabs(curValue) < 3.65) continue;
+
+        isLocalMaxMin = true;
+        more = 0;
+        less = 0;
+        for(int dNum = -1; dNum <= 1; dNum++)
+        {
+            for(int dx = -1; dx <= 1; dx++)
+            {
+                for(int dy = -1; dy <= 1; dy++)
+                {
+                    if(dNum == 0 && dx == 0 && dy == 0) continue;
+
+                    value = DoG[dog + dNum]->getImage()->getPixel(curY + dy, curX + dx);
+                    if(curValue > value)
+                    {
+                        more++;
+                        if(less > 0)
+                        {
+                            isLocalMaxMin = false;
+                            goto exit;
+                        }
+                    }
+                    else if(curValue < value)
+                    {
+                        less++;
+                        if(more > 0)
+                        {
+                            isLocalMaxMin = false;
+                            goto exit;
+                        }
+                    }
+                }
+            }
+        }
+
+        exit: if(isLocalMaxMin)
+        {
+            result.push_back(Point(x, y, curValue, DoG[dog]->getSigma()));
+        }
+
     }
     return result;
 }

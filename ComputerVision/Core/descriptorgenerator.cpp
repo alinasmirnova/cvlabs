@@ -23,7 +23,7 @@ shared_ptr<Descriptor> DescriptorGenerator::getDescriptor(Point p, int surSize, 
 {
     auto descriptor = make_shared<Descriptor>(beansNum*gistNum, p);
 
-    int gistSize = ceil(surSize/gistNum);
+    int gistSize = ceil(surSize*p.scale/gistNum);
     int curGistNum;
     float weight,angle;
     float oneBasket = 360 / beansNum;

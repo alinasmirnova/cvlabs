@@ -8,12 +8,14 @@ shared_ptr<Image> FilterManager::Filter(const Image &source, const Mask &mask, b
     int heighHalf = (mask.getHeight() - 1)/2;
     int widthHalf = (mask.getWidth() - 1)/2;
 
-    float max = numeric_limits<float>::min(), min = numeric_limits<float>::max() ;
+    float max = numeric_limits<float>::min(), min = numeric_limits<float>::max();
 
-
-    for(int i=0; i<result->getHeight(); i++)
+    for(int i=heighHalf; i<result->getHeight() - heighHalf; i++)
     {
-        for(int j=0; j<result->getWidth(); j++)
+        for(int j=widthHalf; j<result->getWidth() - widthHalf; j++)
+//    for(int i=0; i<result->getHeight(); i++)
+//    {
+//        for(int j=0; j<result->getWidth(); j++)
         {
             pixel = 0;
 

@@ -184,30 +184,28 @@ vector<Point> Detectors::AdaptiveNonMaximumSuppression(const vector<Point> &poin
     return result;
 }
 
-vector<Point> Detectors::ScaleInvariant(const Image &image, const Pyramid& pyramid, int halfSizeW, int localMaxSize, float bottom)
+vector<Point> Detectors::ScaleInvariant(const Image &image, const Pyramid& pyramid, int halfWindow)
 {
     vector<Point> result;
-    vector<Point> points;
-    shared_ptr<PyramidLevel> pLevel;
-//    for(int octave=0; octave<pyramid.octaveNum; octave++)
+
+    result = pyramid.findLocalMaximaAndMinima(halfWindow);
+//    vector<Point> cur;
+//    for(int x = halfWindow; x < image.getWidth() - halfWindow; x++)
 //    {
-//        for(int level=0; level<pyramid.levelsNum; level++)
+//        for(int y = halfWindow; y < image.getHeight() - halfWindow; y++)
 //        {
-//            pLevel = pyramid.getLevel(octave,level);
-//            points = Harris(*pLevel->getImage(),halfSizeW * pLevel->getSigma(), localMaxSize, bottom);
-//            for(int i=0; i<points.size(); i++)
+//            if((cur = pyramid.isLocalMaximaAndMinima(x,y)).size() > 0)
 //            {
-//                points[i].scale = pLevel->getSigma();
-//                if(pyramid.isLocalMaximaOrMinima(points[i].x, points[i].y, points[i].scale))
-//                {
-//                    result.push_back(points[i]);
-//                }
+//                result.insert(result.end(), cur.begin(), cur.end());
 //            }
 //        }
 //    }
-    result = pyramid.findLocalMaximaAndMinima();
+
+
+
+    //уточняем координаты для каждой точки
+
+    //удаление точек на краях
     qDebug() << result.size();
-
-
     return result;
 }
