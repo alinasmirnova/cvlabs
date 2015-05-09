@@ -57,27 +57,6 @@ shared_ptr<Descriptor> DescriptorGenerator::getDescriptor(Point p, int surSize, 
             descriptor->addInBean(curGistNum*beansNum + first, firstValue);
             descriptor->addInBean(curGistNum*beansNum + second, secondValue);
         }
-//    int dx,dy;
-
-//    for(int i=0; i<surSize; i++)
-//    {
-//        for(int j=0; j<surSize; j++)
-//        {
-//            curGistNum = (i/gistNum)*gistNum + (j/gistNum);
-//            dx = i - surSize/2;
-//            dy = j - surSize/2;
-
-//            weight = magnitudes->getPixel(y+i, x+j)*(pow(M_E,-(dx*dx + dj*dj)/(2*sigma*sigma)))/(2*M_PI*sigma*sigma);
-//            angle = angles->getPixel(y+i, x+j);
-//            left = angle/oneBasket;
-
-//            leftValue = weight*1;//(angle - left*oneBasket + oneBasket/2)/(oneBasket);
-
-//            descriptor->addInBean(curGistNum*beansNum + left, leftValue);
-//        //    descriptor->addInBean(curGistNum*beansNum + (left + 1)%beansNum, weight - leftValue);
-//        }
-//    }
-
     descriptor->normalize();
     return descriptor;
 }

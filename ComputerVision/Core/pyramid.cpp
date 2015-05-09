@@ -61,13 +61,13 @@ shared_ptr<Pyramid> Pyramid::build(const Image &image, int octaveNum, int levelN
 
             top1 = FilterManager::SeparatedFilter(*next, *MaskFactory::GaussSeparated(curSigma*sqrt(k*k-1)), false, EdgeMode::MIRROR);
             curSigma *= k;
-            innerSigma *= k;
             result->images.push_back(make_shared<PyramidLevel>(top1, i, levelNum, curSigma, innerSigma));
+            innerSigma *= k;
 
             top2 = FilterManager::SeparatedFilter(*top1, *MaskFactory::GaussSeparated(curSigma*sqrt(k*k-1)), false, EdgeMode::MIRROR);
             curSigma *= k;
-            innerSigma *= k;
             result->images.push_back(make_shared<PyramidLevel>(top2, i, levelNum + 1, curSigma, innerSigma));
+            innerSigma *= k;
         }
 
         shared_ptr<Image> DoG;
@@ -149,7 +149,6 @@ vector<Point> Pyramid::findLocalMaximaAndMinima(int halfWindow) const
     float curValue, value;
     bool isLocalMaxMin;
     int more, less;
-    int octaveNum, curScale;
     int border;
     float trace, det;
 
@@ -212,15 +211,13 @@ vector<Point> Pyramid::findLocalMaximaAndMinima(int halfWindow) const
                 }
                 exit: if(isLocalMaxMin)
                 {
-                    curScale = pow(2,DoG[dog]->getOctave());
-
                     //удаление точек на краях
                     trace = dxx->getPixel(y,x) + dyy->getPixel(y,x);
                     det = dxx->getPixel(y,x) * dyy->getPixel(y,x) - pow(dxy->getPixel(y,x),2);
 
                     if(pow(trace,2) / det <= pow(11,2)/10)
                     {
-                        result.push_back(Point(x*curScale, y*curScale, curValue,DoG[dog]->getSigma(), DoG[dog]->getInnerSigma()));
+                        result.push_back(Point(x*pow(2, DoG[dog]->getOctave()), y*pow(2, DoG[dog]->getOctave()), curValue,DoG[dog]->getSigma(), DoG[dog]->getInnerSigma()));
                     }
                 }
             }
@@ -263,12 +260,15 @@ shared_ptr<Descriptor> Pyramid::getDescriptor(Point p, int surSize, int gistNum,
 {
     auto level = getLevel(p.scale);
 
-    int scale = pow(2,level->getOctave());
-    Point p1(p.x/scale, p.y/scale, p.contrast, p.scale, p.innerScale);
-    //find point angle
-    auto gist = level->getGenerator()->getDescriptor(p1, surSize, 1, 36);
+   //find point angle
+   //auto gist = level->getGenerator()->getDescriptor(p1, surSize, 1, 36);
+    p.x = p.x / pow(2, level->getOctave());
+    p.y = p.y / pow(2, level->getOctave());
 
-    auto desk = level->getGenerator()->getDescriptor(p1, surSize, gistNum, basketNum);
+    auto desk = level->getGenerator()->getDescriptor(p, surSize, gistNum, basketNum);
+
+    p.x = p.x * pow(2, level->getOctave());
+    p.y = p.y * pow(2, level->getOctave());
     desk->point = p;
     return desk;
 }

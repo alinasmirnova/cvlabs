@@ -72,10 +72,12 @@ QImage MainWindow::findAndDrawPairs(const Image& img1, const Image& img2,
     int closestNum;
     for(int i=0; i<desc1.size(); i++)
     {
+        //painter.drawRect(desc1[i]->point.x - 1, desc1[i]->point.y - 1, 3, 3);
         closestNum = desc1[i]->findClosest(desc2);
         if(closestNum != -1)
         {
             closest = desc2[closestNum];
+            //painter.drawRect(closest->point.x + img1.getWidth(), closest->point.y - 1, 3, 3);
             painter.setPen(QPen(QColor(rand()%255, rand()%255, rand()%255)));
             painter.drawLine(QPoint(desc1[i]->point.x, desc1[i]->point.y), QPoint(closest->point.x + img1.getWidth() + 1, closest->point.y));
         }
@@ -105,7 +107,7 @@ void MainWindow::findPoints()
     img2 = Image::fromFile("E:/Pictures/examples/scaled.png");
     //img2  = FilterManager::Filter(*img1, *MaskFactory::Shift(10, Direction::DOWN));
     //img2 = Image::getNoisy(*img1);
-    //img2 = Image::changeBrightness(*img1, 30);
+   //img2 = Image::changeBrightness(*img1, 30);
 
     //lab4
 //    auto points1 = findPoints(*img1);

@@ -189,18 +189,6 @@ vector<Point> Detectors::ScaleInvariant(const Image &image, const Pyramid& pyram
     vector<Point> result;
 
     result = pyramid.findLocalMaximaAndMinima(halfWindow);
-//    vector<Point> cur;
-//    for(int x = halfWindow; x < image.getWidth() - halfWindow; x++)
-//    {
-//        for(int y = halfWindow; y < image.getHeight() - halfWindow; y++)
-//        {
-//            if((cur = pyramid.isLocalMaximaAndMinima(x,y)).size() > 0)
-//            {
-//                result.insert(result.end(), cur.begin(), cur.end());
-//            }
-//        }
-//    }
 
-    qDebug() << result.size();
     return result;
 }
