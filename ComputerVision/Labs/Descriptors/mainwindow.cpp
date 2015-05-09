@@ -61,7 +61,7 @@ QImage MainWindow::findAndDrawPairs(const Image& img1, const Image& img2,
 
     for(uint i=0; i<points1.size(); i++) {
         painter.drawRect(points1[i].x - 1, points1[i].y - 1, 3, 3);
-    //    painter.drawEllipse(QPoint(points1[i].x, points1[i].y), points1[i].scale*8, points1[i].scale*8);
+     //   painter.drawEllipse(QPoint(points1[i].x, points1[i].y), points1[i].scale*8, points1[i].scale*8);
     }
     for(uint i=0; i<points2.size(); i++) {
         painter.drawRect(points2[i].x + img1.getWidth(), points2[i].y, 3, 3);
@@ -116,10 +116,10 @@ void MainWindow::findPoints()
 
     //lab5
     qDebug()<<"First pyramid";
-    auto pyramid1 = Pyramid::build(*img1, 5, 5);
+    auto pyramid1 = Pyramid::build(*img1, 6, 4);
     pyramid1->saveToFolder("E:/Pictures/1");
     qDebug()<<"Second pyramid";
-    auto pyramid2 = Pyramid::build(*img2, 5, 5);
+    auto pyramid2 = Pyramid::build(*img2, 6, 4);
 
     qDebug()<<"First points";
     auto points1 = findScaledPoints(*img1, *pyramid1);

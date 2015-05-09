@@ -37,7 +37,7 @@ shared_ptr<Pyramid> Pyramid::build(const Image &image, int octaveNum, int levelN
         auto octaveBottom = FilterManager::SeparatedFilter(image, *MaskFactory::GaussSeparated(sqrt(sigma0*sigma0 - sigmaInit*sigmaInit)), false, EdgeMode::MIRROR);
         curSigma *= k;
 
-        float innerSigma = 1;
+        float innerSigma;
 
 
         for(int i=0; i<octaveNum; i++)
@@ -51,8 +51,8 @@ shared_ptr<Pyramid> Pyramid::build(const Image &image, int octaveNum, int levelN
             {
                 next = FilterManager::SeparatedFilter(*next, *MaskFactory::GaussSeparated(curSigma*sqrt(k*k-1)), false, EdgeMode::MIRROR);
                 curSigma *= k;
-                innerSigma *= k;
                 result->images.push_back(make_shared<PyramidLevel>(next, i, j, curSigma, innerSigma));
+                innerSigma *= k;
             }
 
             octaveBottom = next->compress(2);
@@ -168,14 +168,14 @@ vector<Point> Pyramid::findLocalMaximaAndMinima(int halfWindow) const
         dxx = FilterManager::SeparatedFilter(*dxx, *MaskFactory::SobelSeparated(Asix::X));
 
 
-        border = halfWindow*DoG[dog]->getSigma();
+        border = halfWindow*DoG[dog]->getInnerSigma();
 
         for(int x = border; x < DoG[dog]->getImage()->getWidth()-border; x++)
         {
             for(int y = border; y < DoG[dog]->getImage()->getHeight()-border; y++)
             {                
                 curValue = DoG[dog]->getImage()->getPixel(y, x);
-                if(fabs(curValue) < 6) continue;
+                if(fabs(curValue) < 8) continue;
 
                 isLocalMaxMin = true;
                 more = 0;
@@ -220,7 +220,7 @@ vector<Point> Pyramid::findLocalMaximaAndMinima(int halfWindow) const
 
                     if(pow(trace,2) / det <= pow(11,2)/10)
                     {
-                        result.push_back(Point(x*curScale, y*curScale, curValue, DoG[dog]->getInnerSigma()));
+                        result.push_back(Point(x*curScale, y*curScale, curValue,DoG[dog]->getSigma(), DoG[dog]->getInnerSigma()));
                     }
                 }
             }
@@ -229,75 +229,6 @@ vector<Point> Pyramid::findLocalMaximaAndMinima(int halfWindow) const
     return result;
 }
 
-
-vector<Point> Pyramid::isLocalMaximaAndMinima(int x, int y) const
-{
-    vector<Point> result;
-
-    float curValue, value;
-    bool isLocalMaxMin;
-    int more, less;
-    int octaveNum, curScale;
-
-    int curX, curY;
-
-    for(int dog = 1; dog < DoG.size() - 1; dog++)
-    {
-        if(DoG[dog-1]->getOctave() != DoG[dog]->getOctave() || DoG[dog+1]->getOctave() != DoG[dog]->getOctave())
-            continue;
-
-        curX = x/pow(2, DoG[dog]->getOctave());
-        curY = y/pow(2, DoG[dog]->getOctave());
-
-        if(fabs(curX - DoG[dog]->getImage()->getWidth()) < 16*DoG[dog]->getSigma() ||
-           fabs(curY - DoG[dog]->getImage()->getHeight()) < 16*DoG[dog]->getSigma())
-            continue;
-
-        curValue = DoG[dog]->getImage()->getPixel(curY, curX);
-        if(fabs(curValue) < 3.65) continue;
-
-        isLocalMaxMin = true;
-        more = 0;
-        less = 0;
-        for(int dNum = -1; dNum <= 1; dNum++)
-        {
-            for(int dx = -1; dx <= 1; dx++)
-            {
-                for(int dy = -1; dy <= 1; dy++)
-                {
-                    if(dNum == 0 && dx == 0 && dy == 0) continue;
-
-                    value = DoG[dog + dNum]->getImage()->getPixel(curY + dy, curX + dx);
-                    if(curValue > value)
-                    {
-                        more++;
-                        if(less > 0)
-                        {
-                            isLocalMaxMin = false;
-                            goto exit;
-                        }
-                    }
-                    else if(curValue < value)
-                    {
-                        less++;
-                        if(more > 0)
-                        {
-                            isLocalMaxMin = false;
-                            goto exit;
-                        }
-                    }
-                }
-            }
-        }
-
-        exit: if(isLocalMaxMin)
-        {
-            result.push_back(Point(x, y, curValue, DoG[dog]->getSigma()));
-        }
-
-    }
-    return result;
-}
 
 Pyramid::~Pyramid()
 {
@@ -331,8 +262,9 @@ shared_ptr<PyramidLevel> Pyramid::getLevel(int octave, int level) const
 shared_ptr<Descriptor> Pyramid::getDescriptor(Point p, int surSize, int gistNum, int basketNum) const
 {
     auto level = getLevel(p.scale);
+
     int scale = pow(2,level->getOctave());
-    Point p1(p.x/scale, p.y/scale, p.contrast, p.scale);
+    Point p1(p.x/scale, p.y/scale, p.contrast, p.scale, p.innerScale);
     //find point angle
     auto gist = level->getGenerator()->getDescriptor(p1, surSize, 1, 36);
 

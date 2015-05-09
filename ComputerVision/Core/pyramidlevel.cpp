@@ -6,7 +6,7 @@ PyramidLevel::PyramidLevel(shared_ptr<Image> image, int octave, int level, float
     this->levelNum = level;
     this->octaveNum = octave;
     this->sigma = sigma;
-    this->innerSigma = sigma;
+    this->innerSigma = innerSigma;
     this->generator = make_shared<DescriptorGenerator>(*image);
 }
 
