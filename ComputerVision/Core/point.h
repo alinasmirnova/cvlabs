@@ -1,7 +1,9 @@
 #ifndef POINT_H
 #define POINT_H
 
-struct Point {
+class Point {
+
+public:
     int x;
     int y;
     float contrast;
@@ -12,11 +14,18 @@ struct Point {
     Point(int x, int y, float c, float s): x(x), y(y), contrast(c), scale(s)
     {
         innerScale = 1;
+        angle = 0;
     }
 
     Point(int x, int y, float c, float s, float inner): x(x), y(y), contrast(c), scale(s), innerScale(inner)
-    {}
-    Point(){}
+    {
+        angle = 0;
+    }
+
+    Point()
+    {
+
+    }
 };
 
 #endif // POINT_H

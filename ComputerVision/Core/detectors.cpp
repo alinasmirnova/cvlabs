@@ -78,7 +78,7 @@ vector<Point> Detectors::findLocalMax(const Image &S, int localMaxSize, int half
 exit:            if(isLocalMax)
                  {
                      //emplace_back
-                     points.emplace_back(j, i, pixelValue,0);
+                     points.emplace_back(j, i, pixelValue, 1);
                  }
              }
          }

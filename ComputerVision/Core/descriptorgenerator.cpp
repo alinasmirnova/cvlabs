@@ -19,16 +19,17 @@ DescriptorGenerator::DescriptorGenerator(const Image& image)
     }
 }
 
-shared_ptr<Descriptor> DescriptorGenerator::getDescriptor(Point p, int surSize, int gistNum, int beansNum)
+shared_ptr<Descriptor> DescriptorGenerator::getAngleDescriptor(Point p, int surSize)
 {
-    //find point angle
+    int beansNum = 48;
+    int gistNum = 1;
 
     auto descriptor = make_shared<Descriptor>(beansNum*gistNum, p);
     surSize = surSize*p.innerScale;
 
     int gistSize = ceil(surSize/gistNum);
     int curGistNum;
-    float weight,angle;
+    float weight,angle,r;
     float oneBean = 360 / beansNum;
     int first, second;
     float firstValue, secondValue;
@@ -40,8 +41,12 @@ shared_ptr<Descriptor> DescriptorGenerator::getDescriptor(Point p, int surSize, 
         {
             weight = magnitudes->getPixel(p.y+i, p.x+j)*(pow(M_E,-(i*i + j*j)/(2*sigma*sigma)))/(2*M_PI*sigma*sigma);
             angle = angles->getPixel(p.y+i, p.x+j);
+
+            curGistNum = ((i + surSize/2) / gistSize) * gistNum + (j + surSize/2) / gistSize;
+
             first = angle/oneBean;
-            if(angle < first*angle + 0.5*oneBean)
+
+            if(angle < first*oneBean + 0.5*oneBean)
             {
                 second = first - 1;
                 if(second < 0) second += beansNum;
@@ -50,10 +55,67 @@ shared_ptr<Descriptor> DescriptorGenerator::getDescriptor(Point p, int surSize, 
             {
                 second = (first + 1)%beansNum;
             }
-            firstValue = weight*fabs(first*angle + 0.5*oneBean - angle)/oneBean;
+
+            r = fabs(first*oneBean + 0.5*oneBean - angle);
+            firstValue = weight*(oneBean - r)/oneBean;
             secondValue = weight - firstValue;
 
-            curGistNum = ((i + surSize/2) / gistSize) * gistNum + (j + surSize/2) / gistSize;
+            descriptor->addInBean(curGistNum*beansNum + first, firstValue);
+            descriptor->addInBean(curGistNum*beansNum + second, secondValue);
+        }
+    return descriptor;
+}
+
+
+shared_ptr<Descriptor> DescriptorGenerator::getDescriptor(Point p, int surSize, int gistNum, int beansNum)
+{
+    //find point angle
+
+    auto descriptor = make_shared<Descriptor>(beansNum*gistNum, p);
+    surSize = surSize*p.innerScale;
+
+    int gistSize = ceil(surSize/gistNum);
+    int curGistNum;
+    float weight,angle,r;
+    float oneBean = 360 / beansNum;
+    int first, second;
+    float firstValue, secondValue;
+
+    float sigma = surSize*0.5;
+    float dx, dy;
+    float radA = p.angle * M_PI / 180;
+
+    for(int i = -surSize/2 - sqrt(2); i < surSize/2 + sqrt(2); i++)
+        for(int j = -surSize/2 - sqrt(2); j < surSize/2 + sqrt(2); j++)
+        {
+            weight = magnitudes->getPixel(p.y+i, p.x+j)*(pow(M_E,-(i*i + j*j)/(2*sigma*sigma)))/(2*M_PI*sigma*sigma);
+            angle = - p.angle + angles->getPixel(p.y+i, p.x+j);
+            while(angle < 0) angle += 360;
+
+            dx = j * cos(radA) + i*sin(radA);
+            dy = - j * sin(radA) + i*cos(radA);
+
+            //curGistNum = min(max((dy + surSize/2) / gistSize, 0.0f), gistNum*1.0f - 1) * gistNum + min(max((dx + surSize/2) / gistSize, 0.0f), gistNum*1.0f - 1);
+            //curGistNum = max(((dy + surSize/2)%surSize), 0) * gistNum +  max(((dx + surSize/2)%surSize), 0);
+
+            curGistNum = (int)(dy + surSize/2) / gistSize + (int)(dx + surSize/2) / gistSize;
+
+            first = angle/oneBean;
+
+            if(angle < first*oneBean + 0.5*oneBean)
+            {
+                second = first - 1;
+                if(second < 0) second += beansNum;
+            }
+            else
+            {
+                second = (first + 1)%beansNum;
+            }
+
+            r = fabs(first*oneBean + 0.5*oneBean - angle);
+            firstValue = weight*(oneBean - r)/oneBean;
+            secondValue = weight - firstValue;
+
             descriptor->addInBean(curGistNum*beansNum + first, firstValue);
             descriptor->addInBean(curGistNum*beansNum + second, secondValue);
         }

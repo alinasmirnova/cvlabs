@@ -167,7 +167,7 @@ vector<Point> Pyramid::findLocalMaximaAndMinima(int halfWindow) const
         dxx = FilterManager::SeparatedFilter(*dxx, *MaskFactory::SobelSeparated(Asix::X));
 
 
-        border = halfWindow*DoG[dog]->getInnerSigma();
+        border = halfWindow*DoG[dog]->getInnerSigma()*sqrt(2);
 
         for(int x = border; x < DoG[dog]->getImage()->getWidth()-border; x++)
         {
@@ -217,7 +217,11 @@ vector<Point> Pyramid::findLocalMaximaAndMinima(int halfWindow) const
 
                     if(pow(trace,2) / det <= pow(11,2)/10)
                     {
-                        result.push_back(Point(x*pow(2, DoG[dog]->getOctave()), y*pow(2, DoG[dog]->getOctave()), curValue,DoG[dog]->getSigma(), DoG[dog]->getInnerSigma()));
+                        Point p(x, y, curValue,DoG[dog]->getSigma(), DoG[dog]->getInnerSigma());
+                        p.angle = getLevel(DoG[dog]->getSigma())->getGenerator()->getDescriptor(p, 16, 1, 36)->getMaxAngle().first;
+                        p.x *= pow(2, DoG[dog]->getOctave());
+                        p.y *= pow(2, DoG[dog]->getOctave());
+                        result.push_back(p);
                     }
                 }
             }

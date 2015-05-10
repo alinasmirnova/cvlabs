@@ -157,7 +157,7 @@ float Image::getPixel(int i, int j, EdgeMode mode) const
     }
     else
     {
-        qFatal("out of the range");
+        //qFatal("out of the range");
         switch(mode)
         {
             case EdgeMode::ZEROS: return 0;

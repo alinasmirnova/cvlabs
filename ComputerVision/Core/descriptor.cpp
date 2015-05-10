@@ -79,13 +79,56 @@ int Descriptor::findClosest(vector<shared_ptr<Descriptor>> descriptors)
     return -1;
 }
 
-tuple<int,int> Descriptor::getMaxBeanIndex()
+float Descriptor::getAngle(int bean)
 {
-    float max, maxNext;
+    float oneBean = 360.0/beansNum;
+
+    int left = (bean - 1 + beansNum) % beansNum;
+    int right = (bean + 1) % beansNum;
+
+    float y2 = beans[bean];
+    float x2 = bean * oneBean + oneBean/2;
+
+    float y1 = beans[left];
+    float x1 = x2 - oneBean;
+
+    float y3 = beans[right];
+    float x3 = x2 + oneBean;
+
+    float a = (y3 - (x3*(y2-y1)+x2*y1-x1*y2)/(x2-x1)) / (x3*(x3-x1-x2) + x1*x2);
+    float b = -(a*(x1+x2)) +((y2 - y1)/(x2 - x1));
+
+    return -b/(2*a);
+}
+
+pair<float,float> Descriptor::getMaxAngle()
+{
+    int maxIndex1 = -1, maxIndex2 = -1;
+    float maxValue1 = numeric_limits<float>::min(), maxValue2 = numeric_limits<float>::min();
+
+    for(int i=0; i<beansNum; i++)
+    {
+        if(beans[i] > maxValue1)
+        {
+            maxValue2 = maxValue1;
+            maxIndex2 = maxIndex1;
+
+            maxValue1 = beans[i];
+            maxIndex1 = i;
+        }
+        else if(beans[i] > maxValue2)
+        {
+            maxValue2 = beans[i];
+            maxIndex2 = i;
+        }
+    }
 
 
-
-    return make_tuple(max,maxNext);
+    if(maxValue2 / maxValue1 > 0.8)
+    {
+        return make_pair<float, float>(getAngle(maxIndex1), getAngle(maxIndex2));
+    }
+    return make_pair<float, float>(getAngle(maxIndex1), -1);
 }
 
 Descriptor::~Descriptor()
