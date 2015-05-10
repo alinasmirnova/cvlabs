@@ -50,6 +50,30 @@ void Descriptor::addInBean(int beanNum, float value)
     }
 }
 
+void Descriptor::addInGist(int curGistNum, float angle, float weight, int beanInGist)
+{
+    float oneBean = 360.0 / beanInGist;
+    int first = angle/oneBean;
+    int second;
+
+    if(angle < first*oneBean + 0.5*oneBean)
+    {
+        second = first - 1;
+        if(second < 0) second += beanInGist;
+    }
+    else
+    {
+        second = (first + 1)%beanInGist;
+    }
+
+    float r = fabs(first*oneBean + 0.5*oneBean - angle);
+    float firstValue = weight*(oneBean - r)/oneBean;
+    float secondValue = weight - firstValue;
+
+    addInBean(curGistNum*beanInGist + first, firstValue);
+    addInBean(curGistNum*beanInGist + second, secondValue);
+}
+
 int Descriptor::findClosest(vector<shared_ptr<Descriptor>> descriptors)
 {
     int minIndex1 = -1, minIndex2 = -1;

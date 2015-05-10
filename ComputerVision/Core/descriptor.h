@@ -22,6 +22,7 @@ public:
     static float distance(const Descriptor& d1, const Descriptor& d2);
     void normalize();
     void addInBean(int beanNum, float value);
+    void addInGist(int curGistNum, float angle, float weight, int beanInGist);
 
     pair<float,float> getMaxAngle();
     float getAngle(int bean);

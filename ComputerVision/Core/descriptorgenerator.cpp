@@ -97,24 +97,7 @@ shared_ptr<Descriptor> DescriptorGenerator::getDescriptor(Point p, int surSize, 
 
             curGistNum = ((int)(dy + surSize/2) / gistSize)*gistNum + (int)(dx + surSize/2) / gistSize;
 
-            first = angle/oneBean;
-
-            if(angle < first*oneBean + 0.5*oneBean)
-            {
-                second = first - 1;
-                if(second < 0) second += beansNum;
-            }
-            else
-            {
-                second = (first + 1)%beansNum;
-            }
-
-            r = fabs(first*oneBean + 0.5*oneBean - angle);
-            firstValue = weight*(oneBean - r)/oneBean;
-            secondValue = weight - firstValue;
-
-            descriptor->addInBean(curGistNum*beansNum + first, firstValue);
-            descriptor->addInBean(curGistNum*beansNum + second, secondValue);
+            descriptor->addInGist(curGistNum, angle, weight, beansNum);
         }
     descriptor->normalize();
     return descriptor;
