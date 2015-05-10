@@ -95,10 +95,7 @@ shared_ptr<Descriptor> DescriptorGenerator::getDescriptor(Point p, int surSize, 
             dx = j * cos(radA) + i*sin(radA);
             dy = - j * sin(radA) + i*cos(radA);
 
-            //curGistNum = min(max((dy + surSize/2) / gistSize, 0.0f), gistNum*1.0f - 1) * gistNum + min(max((dx + surSize/2) / gistSize, 0.0f), gistNum*1.0f - 1);
-            //curGistNum = max(((dy + surSize/2)%surSize), 0) * gistNum +  max(((dx + surSize/2)%surSize), 0);
-
-            curGistNum = (int)(dy + surSize/2) / gistSize + (int)(dx + surSize/2) / gistSize;
+            curGistNum = ((int)(dy + surSize/2) / gistSize)*gistNum + (int)(dx + surSize/2) / gistSize;
 
             first = angle/oneBean;
 
