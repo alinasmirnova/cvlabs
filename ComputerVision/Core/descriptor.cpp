@@ -128,7 +128,7 @@ pair<float,float> Descriptor::getMaxAngle()
     {
         return make_pair<float, float>(getAngle(maxIndex1), getAngle(maxIndex2));
     }
-    return make_pair<float, float>(getAngle(maxIndex1), -1);
+    return make_pair<float, float>(getAngle(maxIndex1), numeric_limits<float>::min());
 }
 
 Descriptor::~Descriptor()

@@ -218,10 +218,20 @@ vector<Point> Pyramid::findLocalMaximaAndMinima(int halfWindow) const
                     if(pow(trace,2) / det <= pow(11,2)/10)
                     {
                         Point p(x, y, curValue,DoG[dog]->getSigma(), DoG[dog]->getInnerSigma());
-                        p.angle = getLevel(DoG[dog]->getSigma())->getGenerator()->getDescriptor(p, 16, 1, 36)->getMaxAngle().first;
+                        auto angles = getLevel(DoG[dog]->getSigma())->getGenerator()->getDescriptor(p, 16, 1, 36)->getMaxAngle();
+                        p.angle = angles.first;
                         p.x *= pow(2, DoG[dog]->getOctave());
                         p.y *= pow(2, DoG[dog]->getOctave());
                         result.push_back(p);
+
+                        if(angles.second > numeric_limits<float>::min())
+                        {
+                            Point p1(x, y, curValue,DoG[dog]->getSigma(), DoG[dog]->getInnerSigma());
+                            p.angle = angles.second;
+                            p.x *= pow(2, DoG[dog]->getOctave());
+                            p.y *= pow(2, DoG[dog]->getOctave());
+                            result.push_back(p1);
+                        }
                     }
                 }
             }
