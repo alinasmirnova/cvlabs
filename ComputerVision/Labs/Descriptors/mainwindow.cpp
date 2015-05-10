@@ -52,7 +52,7 @@ QImage MainWindow::findAndDrawPairs(const Image& img1, const Image& img2,
                         vector<Point> points1, vector<Point> points2,
                         vector<shared_ptr<Descriptor>> desc1, vector<shared_ptr<Descriptor>> desc2)
 {
-    QImage result = QImage(img1.getWidth()*2 + 1, img1.getHeight(), QImage::Format_RGB32);
+    QImage result = QImage(img1.getWidth() + img2.getWidth() + 1, max(img1.getHeight(), img2.getHeight()), QImage::Format_RGB32);
     result.fill(0);
     QPainter painter(&result);
     painter.setPen(QPen(QColor(Qt::red)));
@@ -129,9 +129,9 @@ vector<shared_ptr<Descriptor>> MainWindow::findScaledDescriptors(vector<Point> p
 
 void MainWindow::findPoints()
 {
-    img2 = Image::fromFile("E:/Pictures/examples/scaled.png");
-    //img2 = Image::fromFile("E:/Pictures/examples/rotated.png");
-    //img2  = FilterManager::Filter(*img1, *MaskFactory::Shift(10, Direction::DOWN));
+    //img2 = Image::fromFile("E:/Pictures/examples/111.png");
+    img2 = Image::fromFile("E:/Pictures/examples/rotated.png");
+    //img2  = FilterManager::Filter(*img1, *MaskFactory::Shift(15, Direction::DOWN));
     //img2 = Image::getNoisy(*img1);
     //img2 = Image::changeBrightness(*img1, 30);
 
