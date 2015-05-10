@@ -130,46 +130,48 @@ vector<shared_ptr<Descriptor>> MainWindow::findScaledDescriptors(vector<Point> p
 void MainWindow::findPoints()
 {
     //img2 = Image::fromFile("E:/Pictures/examples/111.png");
-    img2 = Image::fromFile("E:/Pictures/examples/rotated.png");
+    //img2 = Image::fromFile("E:/Pictures/examples/rotated.png");
+    img2 = Image::fromFile("E:/Pictures/examples/scaled.png");
+    //img2 = Image::fromFile("E:/Pictures/examples/affin.png");
     //img2  = FilterManager::Filter(*img1, *MaskFactory::Shift(15, Direction::DOWN));
     //img2 = Image::getNoisy(*img1);
     //img2 = Image::changeBrightness(*img1, 30);
 
     //lab4
-    auto points1 = findPoints(*img1);
-    DescriptorGenerator gen1(*img1);
-    //pair<float,float> angle;
-    for(int i=0; i<points1.size(); i++)
-    {
-        points1[i].angle = gen1.getAngleDescriptor(points1[i], 16)->getMaxAngle().first;
-    }
+//    auto points1 = findPoints(*img1);
+//    DescriptorGenerator gen1(*img1);
+//    //pair<float,float> angle;
+//    for(int i=0; i<points1.size(); i++)
+//    {
+//        points1[i].angle = gen1.getAngleDescriptor(points1[i], 16)->getMaxAngle().first;
+//    }
 
-    auto points2 = findPoints(*img2);
-    DescriptorGenerator gen2(*img2);
-    for(int i=0; i<points2.size(); i++)
-    {
-        points2[i].angle = gen2.getAngleDescriptor(points2[i], 16)->getMaxAngle().first;
-    }
+//    auto points2 = findPoints(*img2);
+//    DescriptorGenerator gen2(*img2);
+//    for(int i=0; i<points2.size(); i++)
+//    {
+//        points2[i].angle = gen2.getAngleDescriptor(points2[i], 16)->getMaxAngle().first;
+//    }
 
-    auto desc1 = findDescriptors(*img1, points1);
-    auto desc2 = findDescriptors(*img2, points2);
+//    auto desc1 = findDescriptors(*img1, points1);
+//    auto desc2 = findDescriptors(*img2, points2);
 
     //lab5
-//    qDebug()<<"First pyramid";
-//    auto pyramid1 = Pyramid::build(*img1, 6, 4);
-//    pyramid1->saveToFolder("E:/Pictures/1");
-//    qDebug()<<"Second pyramid";
-//    auto pyramid2 = Pyramid::build(*img2, 6, 4);
+    qDebug()<<"First pyramid";
+    auto pyramid1 = Pyramid::build(*img1, 6, 4);
+    pyramid1->saveToFolder("E:/Pictures/1");
+    qDebug()<<"Second pyramid";
+    auto pyramid2 = Pyramid::build(*img2, 6, 4);
 
-//    qDebug()<<"First points";
-//    auto points1 = findScaledPoints(*img1, *pyramid1);
-//    qDebug()<<"Second points";
-//    auto points2 = findScaledPoints(*img2, *pyramid2);
+    qDebug()<<"First points";
+    auto points1 = findScaledPoints(*img1, *pyramid1);
+    qDebug()<<"Second points";
+    auto points2 = findScaledPoints(*img2, *pyramid2);
 
-//    qDebug()<<"First descriptors";
-//    auto desc1 = findScaledDescriptors(points1, *pyramid1);
-//    qDebug()<<"Second descriptors";
-//    auto desc2 = findScaledDescriptors(points2, *pyramid2);
+    qDebug()<<"First descriptors";
+    auto desc1 = findScaledDescriptors(points1, *pyramid1);
+    qDebug()<<"Second descriptors";
+    auto desc2 = findScaledDescriptors(points2, *pyramid2);
 
     qDebug()<<"Drawing";
 

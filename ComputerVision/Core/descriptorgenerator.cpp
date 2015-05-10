@@ -85,6 +85,9 @@ shared_ptr<Descriptor> DescriptorGenerator::getDescriptor(Point p, int surSize, 
     float dx, dy;
     float radA = p.angle * M_PI / 180;
 
+    int curGistX, curGistY;
+    float topLeftCenterX, topLeftCenterY;
+
     for(int i = -surSize/2 - sqrt(2); i < surSize/2 + sqrt(2); i++)
         for(int j = -surSize/2 - sqrt(2); j < surSize/2 + sqrt(2); j++)
         {
@@ -95,9 +98,30 @@ shared_ptr<Descriptor> DescriptorGenerator::getDescriptor(Point p, int surSize, 
             dx = j * cos(radA) + i*sin(radA);
             dy = - j * sin(radA) + i*cos(radA);
 
-            curGistNum = ((int)(dy + surSize/2) / gistSize)*gistNum + (int)(dx + surSize/2) / gistSize;
+            curGistX = (int)(dy + surSize/2) / gistSize;
+            curGistY = (int)(dx + surSize/2) / gistSize;
 
-            descriptor->addInGist(curGistNum, angle, weight, beansNum);
+            if(dx < curGistX*gistSize + gistSize/2) curGistX = (curGistX - 1 + gistNum)%gistNum;
+            if(dy > curGistY*gistSize + gistSize/2) curGistY = (curGistY - 1 + gistNum)%gistNum;
+
+            topLeftCenterX = curGistX*gistSize + gistSize/2;
+            topLeftCenterY = curGistY*gistSize + gistSize/2;
+
+            //add in top left
+            curGistNum = (curGistY)*gistNum + curGistX;
+            descriptor->addInGist(curGistNum, angle, weight*(gistSize - dy + topLeftCenterY)*(gistSize - dx + topLeftCenterX) / pow(gistSize, 2), beansNum);
+
+            //add in top right
+            curGistNum = (curGistY)*gistNum + (curGistX + 1)%gistNum;
+            descriptor->addInGist(curGistNum, angle, weight*(gistSize - dy + topLeftCenterY)*(dx - topLeftCenterX) / pow(gistSize, 2), beansNum);
+
+            //add in bottom left
+            curGistNum = ((curGistY + 1) % gistNum)*gistNum + curGistX;
+            descriptor->addInGist(curGistNum, angle, weight*(dy - topLeftCenterY)*(gistSize - dx + topLeftCenterX) / pow(gistSize, 2), beansNum);
+
+            //add in bottom right
+            curGistNum = ((curGistY + 1) % gistNum)*gistNum + (curGistX + 1)%gistNum;
+            descriptor->addInGist(curGistNum, angle, weight*(dy - topLeftCenterY)*(dx - topLeftCenterX) / pow(gistSize, 2), beansNum);
         }
     descriptor->normalize();
     return descriptor;
