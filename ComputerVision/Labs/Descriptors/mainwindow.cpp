@@ -61,11 +61,11 @@ QImage MainWindow::findAndDrawPairs(const Image& img1, const Image& img2,
 
     for(uint i=0; i<points1.size(); i++) {
         painter.drawRect(points1[i].x - 1, points1[i].y - 1, 3, 3);
-        painter.drawEllipse(QPoint(points1[i].x, points1[i].y), points1[i].scale*8, points1[i].scale*8);
+       // painter.drawEllipse(QPoint(points1[i].x, points1[i].y), points1[i].scale*sqrt(2)*2, points1[i].scale*sqrt(2)*2);
     }
     for(uint i=0; i<points2.size(); i++) {
         painter.drawRect(points2[i].x + img1.getWidth(), points2[i].y -1, 3, 3);
-        painter.drawEllipse(QPoint(points2[i].x, points2[i].y), points2[i].scale*8, points2[i].scale*8);
+    //    painter.drawEllipse(QPoint(points2[i].x, points2[i].y), points2[i].scale*8, points2[i].scale*8);
     }
 
 //    for(uint i=0; i<desc1.size(); i++) {
@@ -130,8 +130,8 @@ vector<shared_ptr<Descriptor>> MainWindow::findScaledDescriptors(vector<Point> p
 void MainWindow::findPoints()
 {
     //img2 = Image::fromFile("E:/Pictures/examples/111.png");
-    //img2 = Image::fromFile("E:/Pictures/examples/rotated.png");
-    img2 = Image::fromFile("E:/Pictures/examples/scaled.png");
+    img2 = Image::fromFile("E:/Pictures/examples/rotated.png");
+    //img2 = Image::fromFile("E:/Pictures/examples/scaled.png");
     //img2 = Image::fromFile("E:/Pictures/examples/affin.png");
     //img2  = FilterManager::Filter(*img1, *MaskFactory::Shift(15, Direction::DOWN));
     //img2 = Image::getNoisy(*img1);
@@ -158,10 +158,10 @@ void MainWindow::findPoints()
 
     //lab5
     qDebug()<<"First pyramid";
-    auto pyramid1 = Pyramid::build(*img1, 6, 4);
+    auto pyramid1 = Pyramid::build(*img1, 3, 4, 1.6);
     pyramid1->saveToFolder("E:/Pictures/1");
     qDebug()<<"Second pyramid";
-    auto pyramid2 = Pyramid::build(*img2, 6, 4);
+    auto pyramid2 = Pyramid::build(*img2, 3, 4, 1.6);
 
     qDebug()<<"First points";
     auto points1 = findScaledPoints(*img1, *pyramid1);
@@ -178,7 +178,7 @@ void MainWindow::findPoints()
 
     auto result = findAndDrawPairs(*img1, *img2, points1, points2, desc1, desc2);
 
-    QString savePath = curFolder.absolutePath() + "/descriptors/1.png";
+    QString savePath = curFolder.absolutePath() + "/descriptors/11.png";
     result.save(savePath);
 }
 

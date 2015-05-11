@@ -122,6 +122,7 @@ float Descriptor::getAngle(int bean)
     float a = (y3 - (x3*(y2-y1)+x2*y1-x1*y2)/(x2-x1)) / (x3*(x3-x1-x2) + x1*x2);
     float b = -(a*(x1+x2)) +((y2 - y1)/(x2 - x1));
 
+    if(a == 0) return 0;
     return -b/(2*a);
 }
 

@@ -28,51 +28,56 @@ shared_ptr<Pyramid> Pyramid::build(const Image &image, int octaveNum, int levelN
     if(octaveNum > 0 && levelNum > 0)
     {
         shared_ptr<Pyramid> result = make_shared<Pyramid>(octaveNum, levelNum);
-        shared_ptr<Image> next, top1, top2;
+        shared_ptr<Image> next, top1, top2, top3;
 
-        float k = pow(2, 1./levelNum);
+        float k = pow(2, 1./(levelNum - 1));
 
         float curSigma = sigma0 / k;
         float bottomSigma = sigma0 / k;
         auto octaveBottom = FilterManager::SeparatedFilter(image, *MaskFactory::GaussSeparated(sqrt(sigma0*sigma0 - sigmaInit*sigmaInit)), false, EdgeMode::MIRROR);
 
-        curSigma *= k;
+        //curSigma *= k;
 
         float innerSigma;
 
 
         for(int i=0; i<octaveNum; i++)
         {
-            innerSigma = 1;
+            innerSigma = sigma0;
             result->images.push_back(make_shared<PyramidLevel>(octaveBottom, i, -1, bottomSigma, innerSigma));
-            qDebug()<<bottomSigma;
+            //qDebug()<<bottomSigma;
 
             next = octaveBottom;
             curSigma = bottomSigma;
 
-            for(int j=0; j<levelNum; j++)
+            for(int j=0; j<levelNum-1; j++)
             {
                 next = FilterManager::SeparatedFilter(*next, *MaskFactory::GaussSeparated(curSigma*sqrt(k*k-1)), false, EdgeMode::MIRROR);
                 curSigma *= k;
                 result->images.push_back(make_shared<PyramidLevel>(next, i, j, curSigma, innerSigma));
-                qDebug() << curSigma;
+                //qDebug() << curSigma;
                 innerSigma *= k;
             }
 
             octaveBottom = next->compress(2);
             bottomSigma = curSigma;
 
-
             top1 = FilterManager::SeparatedFilter(*next, *MaskFactory::GaussSeparated(curSigma*sqrt(k*k-1)), false, EdgeMode::MIRROR);
             curSigma *= k;
-            result->images.push_back(make_shared<PyramidLevel>(top1, i, levelNum, curSigma, innerSigma));
-            qDebug() << curSigma;
+            result->images.push_back(make_shared<PyramidLevel>(top1, i, levelNum-1, curSigma, innerSigma));
+            //qDebug() << curSigma;
             innerSigma *= k;
 
             top2 = FilterManager::SeparatedFilter(*top1, *MaskFactory::GaussSeparated(curSigma*sqrt(k*k-1)), false, EdgeMode::MIRROR);
             curSigma *= k;
-            result->images.push_back(make_shared<PyramidLevel>(top2, i, levelNum + 1, curSigma, innerSigma));
-            qDebug() << curSigma;
+            result->images.push_back(make_shared<PyramidLevel>(top2, i, levelNum, curSigma, innerSigma));
+            //qDebug() << curSigma;
+            innerSigma *= k;
+
+            top3 = FilterManager::SeparatedFilter(*top2, *MaskFactory::GaussSeparated(curSigma*sqrt(k*k-1)), false, EdgeMode::MIRROR);
+            curSigma *= k;
+            result->images.push_back(make_shared<PyramidLevel>(top3, i, levelNum + 1, curSigma, innerSigma));
+            //qDebug() << curSigma;
             innerSigma *= k;
         }
 
@@ -96,6 +101,9 @@ shared_ptr<Pyramid> Pyramid::build(const Image &image, int octaveNum, int levelN
             }
         }
 
+//        for(int i=0; i<result->DoG.size(); i++){
+//            result->DoG[i]->getImage()->normalize(0,255);
+//        }
         return result;
     }
     else
@@ -175,12 +183,15 @@ vector<Point> Pyramid::findLocalMaximaAndMinima(int halfWindow) const
 
         border = ceil(halfWindow*DoG[dog]->getInnerSigma()*sqrt(2));
 
-        for(int x = border; x < DoG[dog]->getImage()->getWidth()-border; x++)
+        int borderX = DoG[dog]->getImage()->getWidth() / 20;
+        int borderY = DoG[dog]->getImage()->getHeight() / 20;
+
+        for(int x = borderX; x < DoG[dog]->getImage()->getWidth()-borderX; x++)
         {
-            for(int y = border; y < DoG[dog]->getImage()->getHeight()-border; y++)
+            for(int y = borderY; y < DoG[dog]->getImage()->getHeight()-borderY; y++)
             {                
                 curValue = DoG[dog]->getImage()->getPixel(y, x);
-                if(fabs(curValue) < 8) continue;
+                if(fabs(curValue) < 6) continue;
 
                 isLocalMaxMin = true;
                 more = 0;
@@ -233,9 +244,9 @@ vector<Point> Pyramid::findLocalMaximaAndMinima(int halfWindow) const
                         if(angles.second > numeric_limits<float>::min())
                         {
                             Point p1(x, y, curValue,DoG[dog]->getSigma(), DoG[dog]->getInnerSigma());
-                            p.angle = angles.second;
-                            p.x *= pow(2, DoG[dog]->getOctave());
-                            p.y *= pow(2, DoG[dog]->getOctave());
+                            p1.angle = angles.second;
+                            p1.x *= pow(2, DoG[dog]->getOctave());
+                            p1.y *= pow(2, DoG[dog]->getOctave());
                             result.push_back(p1);
                         }
                     }
@@ -243,6 +254,7 @@ vector<Point> Pyramid::findLocalMaximaAndMinima(int halfWindow) const
             }
         }
     }
+    qDebug() << result.size();
     return result;
 }
 
@@ -255,7 +267,7 @@ Pyramid::~Pyramid()
 
 shared_ptr<PyramidLevel> Pyramid::getLevel(float sigma) const
 {
-    for(int i=0; i<images.size(); i++)
+    for(int i=images.size() - 1; i>=0; i--)
     {
         if(sigma == images[i]->getSigma() && images[i]->getLevel() > -1 && images[i]->getLevel() < levelsNum)
         {
