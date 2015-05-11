@@ -131,8 +131,8 @@ void MainWindow::findPoints()
 {
     //img2 = Image::fromFile("E:/Pictures/examples/111.png");
     //img2 = Image::fromFile("E:/Pictures/examples/rotated.png");
-    img2 = Image::fromFile("E:/Pictures/examples/scaled.png");
-    //img2 = Image::fromFile("E:/Pictures/examples/affin.png");
+    //img2 = Image::fromFile("E:/Pictures/examples/scaled.png");
+    img2 = Image::fromFile("E:/Pictures/examples/affin.png");
     //img2  = FilterManager::Filter(*img1, *MaskFactory::Shift(15, Direction::DOWN));
     //img2 = Image::getNoisy(*img1);
     //img2 = Image::changeBrightness(*img1, 30);
