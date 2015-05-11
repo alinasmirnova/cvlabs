@@ -55,24 +55,21 @@ shared_ptr<Descriptor> DescriptorGenerator::getDescriptor(Point p, int surSize, 
     //find point angle
 
     auto descriptor = make_shared<Descriptor>(beansNum*gistNum, p);
-    surSize = surSize*p.innerScale;
+    float surSize1 = surSize*p.innerScale;
 
-    int gistSize = ceil(surSize/gistNum);
+    int gistSize = ceil(surSize1/gistNum);
     int curGistNum;
     float weight,angle,r;
-    float oneBean = 360 / beansNum;
-    int first, second;
-    float firstValue, secondValue;
 
-    float sigma = surSize*0.5;
+    float sigma = surSize1*0.5;
     float dx, dy;
     float radA = p.angle * M_PI / 180;
 
     int curGistX, curGistY;
     float topLeftCenterX, topLeftCenterY;
 
-    for(int i = -surSize/2 - sqrt(2); i < surSize/2 + sqrt(2); i++)
-        for(int j = -surSize/2 - sqrt(2); j < surSize/2 + sqrt(2); j++)
+    for(int i = floor(-surSize1/2 - sqrt(2)); i < ceil(surSize1/2 + sqrt(2)); i++)
+        for(int j = floor(-surSize1/2 - sqrt(2)); j < ceil(surSize1/2 + sqrt(2)); j++)
         {
             weight = magnitudes->getPixel(p.y+i, p.x+j)*(pow(M_E,-(i*i + j*j)/(2*sigma*sigma)))/(2*M_PI*sigma*sigma);
             angle = - p.angle + angles->getPixel(p.y+i, p.x+j);
@@ -81,8 +78,8 @@ shared_ptr<Descriptor> DescriptorGenerator::getDescriptor(Point p, int surSize, 
             dx = j * cos(radA) + i*sin(radA);
             dy = - j * sin(radA) + i*cos(radA);
 
-            curGistX = (int)(dy + surSize/2) / gistSize;
-            curGistY = (int)(dx + surSize/2) / gistSize;
+            curGistX = (int)(dy + surSize1/2) / gistSize;
+            curGistY = (int)(dx + surSize1/2) / gistSize;
 
             if(dx < curGistX*gistSize + gistSize/2) curGistX = (curGistX - 1 + gistNum)%gistNum;
             if(dy > curGistY*gistSize + gistSize/2) curGistY = (curGistY - 1 + gistNum)%gistNum;
