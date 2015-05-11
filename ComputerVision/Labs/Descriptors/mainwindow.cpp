@@ -64,7 +64,7 @@ QImage MainWindow::findAndDrawPairs(const Image& img1, const Image& img2,
      //   painter.drawEllipse(QPoint(points1[i].x, points1[i].y), points1[i].scale*8, points1[i].scale*8);
     }
     for(uint i=0; i<points2.size(); i++) {
-        painter.drawRect(points2[i].x + img1.getWidth(), points2[i].y, 3, 3);
+        painter.drawRect(points2[i].x + img1.getWidth(), points2[i].y -1, 3, 3);
     //    painter.drawEllipse(QPoint(points2[i].x, points2[i].y), points2[i].scale*8, points2[i].scale*8);
     }
 
