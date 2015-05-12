@@ -173,13 +173,15 @@ void MainWindow::findPoints()
     qDebug()<<"Second descriptors";
     auto desc2 = findScaledDescriptors(points2, *pyramid2);
 
-    qDebug()<<"Drawing";
+//    qDebug()<<"Drawing";
 
+//    auto result = findAndDrawPairs(*img1, *img2, points1, points2, desc1, desc2);
 
-    auto result = findAndDrawPairs(*img1, *img2, points1, points2, desc1, desc2);
+//    QString savePath = curFolder.absolutePath() + "/descriptors/11.png";
+//    result.save(savePath);
 
-    QString savePath = curFolder.absolutePath() + "/descriptors/11.png";
-    result.save(savePath);
+    auto models = make_shared<Models>(desc1, desc2);
+    models->RANSAAK(1000);
 }
 
 MainWindow::~MainWindow()
