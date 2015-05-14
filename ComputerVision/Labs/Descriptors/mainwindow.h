@@ -5,6 +5,7 @@
 #include <QFileDialog>
 #include <QPainter>
 #include "core.h"
+#include "models.h"
 
 
 namespace Ui {
@@ -34,6 +35,8 @@ private:
     QImage findAndDrawPairs(const Image& img1, const Image& img2,
                     vector<Point> points1, vector<Point> points2,
                     vector<shared_ptr<Descriptor> > desc1, vector<shared_ptr<Descriptor> > desc2);
+
+    QImage createPanorama(const Image &img1, const Image& img2, float * model);
 
 private slots:
     void chooseFile();

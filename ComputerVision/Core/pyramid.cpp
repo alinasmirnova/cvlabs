@@ -191,7 +191,7 @@ vector<Point> Pyramid::findLocalMaximaAndMinima(int halfWindow) const
             for(int y = borderY; y < DoG[dog]->getImage()->getHeight()-borderY; y++)
             {                
                 curValue = DoG[dog]->getImage()->getPixel(y, x);
-                if(fabs(curValue) < 6) continue;
+                if(fabs(curValue) < 1) continue;
 
                 isLocalMaxMin = true;
                 more = 0;

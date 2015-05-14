@@ -111,6 +111,22 @@ QImage MainWindow::findAndDrawPairs(const Image& img1, const Image& img2,
     return result;
 }
 
+QImage MainWindow::createPanorama(const Image &img1, const Image& img2, float * model)
+{
+    QImage result = QImage(img1.getWidth(),img1.getHeight(), QImage::Format_RGB32);
+    result.fill(0);
+    QPainter painter(&result);
+    painter.drawImage(0,0,img1.toQImage());
+
+    QTransform transform(model[4], model[1], model[7],
+                         model[3], model[0], model[6],
+                         model[5], model[2], model[8]);
+
+    painter.setTransform(transform);
+    painter.drawImage(0, 0, img2.toQImage());
+    return result;
+}
+
 vector<Point> MainWindow::findScaledPoints(const Image& image, const Pyramid& pyramid)
 {
     auto points = Detectors::ScaleInvariant(image, pyramid, 8);
@@ -159,7 +175,7 @@ void MainWindow::findPoints()
     //lab5
     qDebug()<<"First pyramid";
     auto pyramid1 = Pyramid::build(*img1, 3, 4, 1.6);
-    pyramid1->saveToFolder("E:/Pictures/1");
+    //pyramid1->saveToFolder("E:/Pictures/1");
     qDebug()<<"Second pyramid";
     auto pyramid2 = Pyramid::build(*img2, 3, 4, 1.6);
 
@@ -180,6 +196,13 @@ void MainWindow::findPoints()
 
     QString savePath = curFolder.absolutePath() + "/descriptors/11.png";
     result.save(savePath);
+
+    qDebug()<<"Ransac";
+    auto models = make_shared<Models>(desc1, desc2);
+    auto model = models->RanSaC(1500, 1);
+    auto image = createPanorama(*img1, *img2, model);
+    savePath = curFolder.absolutePath() + "/descriptors/panorama.png";
+    image.save(savePath);
 }
 
 MainWindow::~MainWindow()
