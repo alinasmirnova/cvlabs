@@ -141,7 +141,7 @@ vector<Point> Detectors::AdaptiveNonMaximumSuppression(const vector<Point> &poin
 {
     vector<Point> sortedPoints = vector<Point>(points);
 
-    if(maxPointNum >= points.size())
+    if(maxPointNum >= (int)points.size())
     {
         return sortedPoints;
     }
@@ -152,7 +152,7 @@ vector<Point> Detectors::AdaptiveNonMaximumSuppression(const vector<Point> &poin
 
     float r = maxR;
     bool isMax;
-    while(result.size() < maxPointNum)
+    while((int)result.size() < maxPointNum)
     {
         r = r/2;
         for(uint i=0; i<sortedPoints.size(); i++)
@@ -173,7 +173,7 @@ vector<Point> Detectors::AdaptiveNonMaximumSuppression(const vector<Point> &poin
                 {
                     isInResult[i] = true;
                     result.push_back(sortedPoints[i]);
-                    if(result.size() == maxPointNum)
+                    if((int)result.size() == maxPointNum)
                     {
                         break;
                     }
@@ -184,7 +184,7 @@ vector<Point> Detectors::AdaptiveNonMaximumSuppression(const vector<Point> &poin
     return result;
 }
 
-vector<Point> Detectors::ScaleInvariant(const Image &image, const Pyramid& pyramid, int halfWindow)
+vector<Point> Detectors::ScaleInvariant(const Pyramid& pyramid, int halfWindow)
 {
     vector<Point> result;
 

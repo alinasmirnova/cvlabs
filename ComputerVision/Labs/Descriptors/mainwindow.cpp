@@ -41,7 +41,7 @@ vector<shared_ptr<Descriptor>> MainWindow::findDescriptors(const Image& image, v
 {
     vector<shared_ptr<Descriptor>> descriptors;
     DescriptorGenerator generator(image);
-    for(int i=0; i<points.size(); i++)
+    for(uint i=0; i<points.size(); i++)
     {
        descriptors.push_back(generator.getDescriptor(points[i], 16, 4, 8));
     }
@@ -95,7 +95,7 @@ QImage MainWindow::findAndDrawPairs(const Image& img1, const Image& img2,
 
     shared_ptr<Descriptor> closest;
     int closestNum;
-    for(int i=0; i<desc1.size(); i++)
+    for(uint i=0; i<desc1.size(); i++)
     {
         //painter.drawRect(desc1[i]->point.x - 1, desc1[i]->point.y - 1, 3, 3);
         closestNum = desc1[i]->findClosest(desc2);
@@ -127,16 +127,16 @@ QImage MainWindow::createPanorama(const Image &img1, const Image& img2, float * 
     return result;
 }
 
-vector<Point> MainWindow::findScaledPoints(const Image& image, const Pyramid& pyramid)
+vector<Point> MainWindow::findScaledPoints(const Pyramid& pyramid)
 {
-    auto points = Detectors::ScaleInvariant(image, pyramid, 8);
+    auto points = Detectors::ScaleInvariant(pyramid, 8);
     return points;//Detectors::AdaptiveNonMaximumSuppression(points, 200, max(image.getHeight(), image.getWidth()));
 }
 
 vector<shared_ptr<Descriptor>> MainWindow::findScaledDescriptors(vector<Point> points, const Pyramid& pyramid)
 {
     vector<shared_ptr<Descriptor>> descriptors;
-    for(int i=0; i<points.size(); i++)
+    for(uint i=0; i<points.size(); i++)
     {
         descriptors.push_back(pyramid.getDescriptor(points[i], 16, 4, 8));
     }
@@ -180,9 +180,9 @@ void MainWindow::findPoints()
     auto pyramid2 = Pyramid::build(*img2, 3, 4, 1.6);
 
     qDebug()<<"First points";
-    auto points1 = findScaledPoints(*img1, *pyramid1);
+    auto points1 = findScaledPoints(*pyramid1);
     qDebug()<<"Second points";
-    auto points2 = findScaledPoints(*img2, *pyramid2);
+    auto points2 = findScaledPoints(*pyramid2);
 
     qDebug()<<"First descriptors";
     auto desc1 = findScaledDescriptors(points1, *pyramid1);
