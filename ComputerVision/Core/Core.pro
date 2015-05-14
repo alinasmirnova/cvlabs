@@ -10,18 +10,6 @@ CONFIG += staticlib
 CONFIG += c++1y
 QMAKE_CXXFLAGS += -std=c++1y
 
-INCLUDEPATH += $$PWD/../../../GnuWin32/include
-DEPENDPATH += $$PWD/../../../GnuWin32/include
-
-win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../../GnuWin32/lib/ -lgsl
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../../GnuWin32/lib/ -lgsld
-else:unix: LIBS += -L$$PWD/../../../GnuWin32/lib/ -lgsl
-
-win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../../GnuWin32/lib/ -lgslcblas
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../../GnuWin32/lib/ -lgslcblasd
-else:unix: LIBS += -L$$PWD/../../../GnuWin32/lib/ -lgslcblas
-
-
 SOURCES += image.cpp \
     filtermanager.cpp \
     maskfactory.cpp \
@@ -53,10 +41,6 @@ unix {
     target.path = /usr/lib
     INSTALLS += target
 }
-
-
-message (INCLUDEPATH: $$INCLUDEPATH)
-message (LIBS: $$LIBS)
 
 
 

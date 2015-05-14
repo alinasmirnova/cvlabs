@@ -22,7 +22,7 @@ public:
     static shared_ptr<Pyramid> build(const Image &image, int octaveNum, int levelNum, float sigma0 = 1, float sigmaInit = 0.5);
     float findPixel(int i, int j, float sigma);
 
-    vector<Point> findLocalMaximaAndMinima(int halfWindow) const;
+    vector<Point> findLocalMaximaAndMinima() const;
     vector<Point> isLocalMaximaAndMinima(int x, int y) const;
 
     shared_ptr<PyramidLevel> getLevel(float sigma) const;

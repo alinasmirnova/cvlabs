@@ -83,7 +83,7 @@ shared_ptr<Pyramid> Pyramid::build(const Image &image, int octaveNum, int levelN
 
         shared_ptr<Image> DoG;
         shared_ptr<Image> top, bottom;
-        for(int i=0; i<result->images.size()-1; i++)
+        for(uint i=0; i<result->images.size()-1; i++)
         {
             if(result->images[i]->getOctave() == result->images[i+1]->getOctave())
             {
@@ -156,19 +156,19 @@ float Pyramid::findPixel(int i, int j, float sigma)
     return lowPixel + (highPixel - lowPixel)*(sigma - lowSigma)/(hightSigma - lowSigma);
 }
 
-vector<Point> Pyramid::findLocalMaximaAndMinima(int halfWindow) const
+vector<Point> Pyramid::findLocalMaximaAndMinima() const
 {
     vector<Point> result;
 
     float curValue, value;
     bool isLocalMaxMin;
     int more, less;
-    int border;
+    int borderX, borderY;
     float trace, det;
 
     shared_ptr<Image> dxx, dyy, dxy;
 
-    for(int dog = 1; dog < DoG.size() - 1; dog++)
+    for(uint dog = 1; dog < DoG.size() - 1; dog++)
     {
         if(DoG[dog-1]->getOctave() != DoG[dog]->getOctave() || DoG[dog+1]->getOctave() != DoG[dog]->getOctave())
             continue;
@@ -181,10 +181,8 @@ vector<Point> Pyramid::findLocalMaximaAndMinima(int halfWindow) const
         dxx = FilterManager::SeparatedFilter(*dxx, *MaskFactory::SobelSeparated(Asix::X));
 
 
-        border = ceil(halfWindow*DoG[dog]->getInnerSigma()*sqrt(2));
-
-        int borderX = DoG[dog]->getImage()->getWidth() / 20;
-        int borderY = DoG[dog]->getImage()->getHeight() / 20;
+        borderX = DoG[dog]->getImage()->getWidth() / 20;
+        borderY = DoG[dog]->getImage()->getHeight() / 20;
 
         for(int x = borderX; x < DoG[dog]->getImage()->getWidth()-borderX; x++)
         {
@@ -279,7 +277,7 @@ shared_ptr<PyramidLevel> Pyramid::getLevel(float sigma) const
 
 shared_ptr<PyramidLevel> Pyramid::getLevel(int octave, int level) const
 {
-    for(int i=0; i<images.size(); i++)
+    for(uint i=0; i<images.size(); i++)
     {
         if(octave == images[i]->getOctave() && level == images[i]->getLevel())
         {

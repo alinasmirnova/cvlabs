@@ -29,10 +29,7 @@ shared_ptr<Descriptor> DescriptorGenerator::getAngleDescriptor(Point p, int surS
 
     int gistSize = ceil(surSize/gistNum);
     int curGistNum;
-    float weight,angle,r;
-    float oneBean = 360 / beansNum;
-    int first, second;
-    float firstValue, secondValue;
+    float weight,angle;
 
     float sigma = surSize*0.5;
 
@@ -59,7 +56,7 @@ shared_ptr<Descriptor> DescriptorGenerator::getDescriptor(Point p, int surSize, 
 
     int gistSize = ceil(surSize1/gistNum);
     int curGistNum;
-    float weight,angle,r;
+    float weight,angle;
 
     float sigma = surSize1*0.5;
     float dx, dy;

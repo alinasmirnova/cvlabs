@@ -12,7 +12,7 @@ class Models
 public:
     Models(vector<shared_ptr<Descriptor>> desc1, vector<shared_ptr<Descriptor>> desc2);
 
-    void RANSAAK(int iterCount);
+    void RanSaC(int iterCount, float eps);
 
     ~Models();
 };

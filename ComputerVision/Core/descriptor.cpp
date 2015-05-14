@@ -76,16 +76,15 @@ void Descriptor::addInGist(int curGistNum, float angle, float weight, int beanIn
 
 int Descriptor::findClosest(vector<shared_ptr<Descriptor>> descriptors)
 {
-    int minIndex1 = -1, minIndex2 = -1;
+    int minIndex1 = -1;
     float minValue1 = numeric_limits<float>::max(), minValue2 = numeric_limits<float>::max(), value;
 
-    for(int i=0; i<descriptors.size(); i++)
+    for(int i=0; i<(int)descriptors.size(); i++)
     {
         value = distance(*this, *descriptors[i]);
         if(value < minValue1)
         {
             minValue2 = minValue1;
-            minIndex2 = minIndex1;
 
             minValue1 = value;
             minIndex1 = i;
@@ -93,7 +92,6 @@ int Descriptor::findClosest(vector<shared_ptr<Descriptor>> descriptors)
         else if(value < minValue2)
         {
             minValue2 = value;
-            minIndex2 = i;
         }
     }
     if(minValue1 / minValue2 < 0.8)

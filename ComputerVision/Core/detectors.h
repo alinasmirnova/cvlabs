@@ -20,7 +20,7 @@ public:
     static vector<Point> Moravec(const Image &image, int halfSizeW, int localMaxSize, float bottom);
     static vector<Point> Harris(const Image &image, int halfSizeW, int localMaxSize, float bottom);
 
-    static vector<Point> ScaleInvariant(const Image &image, const Pyramid& pyramid, int halfWindow);
+    static vector<Point> ScaleInvariant(const Pyramid& pyramid);
 
     static vector<Point> AdaptiveNonMaximumSuppression(const vector<Point> &points, int maxPointNum, int maxR);
     ~Detectors();

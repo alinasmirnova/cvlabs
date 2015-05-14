@@ -10,6 +10,5 @@
 #include "descriptorgenerator.h"
 #include "point.h"
 #include "descriptor.h"
-#include "models.h"
 #endif
 

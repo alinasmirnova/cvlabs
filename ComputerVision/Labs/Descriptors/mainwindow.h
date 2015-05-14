@@ -28,7 +28,7 @@ private:
     vector<Point> findPoints(const Image& image);
     vector<shared_ptr<Descriptor>> findDescriptors(const Image& image, vector<Point> points);
 
-    vector<Point> findScaledPoints(const Image& image, const Pyramid &pyramid);
+    vector<Point> findScaledPoints(const Pyramid &pyramid);
     vector<shared_ptr<Descriptor>> findScaledDescriptors(vector<Point> points, const Pyramid &pyramid);
 
     QImage findAndDrawPairs(const Image& img1, const Image& img2,
