@@ -127,10 +127,10 @@ QImage MainWindow::drawBestPoints(const Models &models, const Image &img1, const
         else painter.setPen(QPen(QColor(Qt::green)));
 
         painter.drawRect(models.best[i].first.x - 1, models.best[i].first.y - 1, 3, 3);
-        painter.drawEllipse(QPoint(models.best[i].first.x, models.best[i].first.y), models.best[i].first.scale*8/1.6, models.best[i].first.scale*8/1.6);
+        //painter.drawEllipse(QPoint(models.best[i].first.x, models.best[i].first.y), models.best[i].first.scale*8/1.6, models.best[i].first.scale*8/1.6);
 
         painter.drawRect(models.best[i].second.x + img1.getWidth(), models.best[i].second.y -1, 3, 3);
-        painter.drawEllipse(QPoint(models.best[i].second.x + img1.getWidth() + 1, models.best[i].second.y), models.best[i].second.scale*8/1.6, models.best[i].second.scale*8/1.6);
+        //painter.drawEllipse(QPoint(models.best[i].second.x + img1.getWidth() + 1, models.best[i].second.y), models.best[i].second.scale*8/1.6, models.best[i].second.scale*8/1.6);
 
         painter.drawLine(QPoint(models.best[i].first.x, models.best[i].first.y), QPoint(models.best[i].second.x + img1.getWidth() + 1, models.best[i].second.y));
     }
@@ -172,7 +172,7 @@ QImage MainWindow::createPanorama(const Image &img1, const Image& img2, float *h
 
 vector<Point> MainWindow::findScaledPoints(const Pyramid& pyramid)
 {
-    auto points = Detectors::ScaleInvariant(pyramid, 8);
+    auto points = Detectors::ScaleInvariant(pyramid);
     return points;//Detectors::AdaptiveNonMaximumSuppression(points, 200, max(image.getHeight(), image.getWidth()));
 }
 
