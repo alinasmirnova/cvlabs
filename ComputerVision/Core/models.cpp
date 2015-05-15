@@ -3,7 +3,7 @@
 Models::Models(vector<shared_ptr<Descriptor> > desc1, vector<shared_ptr<Descriptor> > desc2)
 {
     matches = vector<pair<shared_ptr<Descriptor>, shared_ptr<Descriptor>>>();
-
+    best = vector<pair<Point, Point>>(8);
     int closestNum;
     for(uint i=0; i<desc1.size(); i++)
     {
@@ -16,9 +16,9 @@ Models::Models(vector<shared_ptr<Descriptor> > desc1, vector<shared_ptr<Descript
     qDebug() << matches.size();
 }
 
-void Models::RanSaC(int iterCount, float eps)
+float* Models::RanSaC(int iterCount, float eps)
 {
-    if(matches.size() < 4 || iterCount == 0) return;
+    if(matches.size() < 4 || iterCount == 0) return NULL;
 
     int iter = 0;
 
@@ -33,8 +33,10 @@ void Models::RanSaC(int iterCount, float eps)
     gsl_matrix *A = gsl_matrix_alloc(8,9);
     gsl_matrix *AT = gsl_matrix_alloc(9,8);
     gsl_matrix *multA = gsl_matrix_alloc(9,9);
-    gsl_matrix *V = gsl_matrix_alloc(9, 1);
+    gsl_matrix *V = gsl_matrix_alloc(9, 9);
     gsl_vector *singular = gsl_vector_alloc(9);
+
+    gsl_matrix_set_zero(A);
 
     float h[9];
     int inliners;
@@ -51,12 +53,14 @@ void Models::RanSaC(int iterCount, float eps)
         baseMatches[2] = rnd(mt_rand);
         baseMatches[3] = rnd(mt_rand);
 
+        gsl_matrix_set_zero(A);
+
         //we want them to be different
         while(1)
         {
             anyOverlap = false;
             for(int i=0; i<4; i++)
-                for(int j=i; j<4; j++)
+                for(int j=i+1; j<4; j++)
                     if(baseMatches[i] == baseMatches[j])
                     {
                         anyOverlap = true;
@@ -74,21 +78,27 @@ void Models::RanSaC(int iterCount, float eps)
         //set matrix A
         for(int i=0; i<4; i++)
         {
-            gsl_matrix_set(A, i*2, 0, matches[baseMatches[i]].first->point.x);
-            gsl_matrix_set(A, i*2, 1, matches[baseMatches[i]].first->point.y);
+            xInit = matches[baseMatches[i]].first->point.x;
+            yInit = matches[baseMatches[i]].first->point.y;
+
+            xExpect = matches[baseMatches[i]].second->point.x;
+            yExpect = matches[baseMatches[i]].second->point.y;
+
+            gsl_matrix_set(A, i*2, 0, xInit);
+            gsl_matrix_set(A, i*2, 1, yInit);
             gsl_matrix_set(A, i*2, 2, 1);
 
-            gsl_matrix_set(A, i*2, 6, -matches[baseMatches[i]].first->point.x * matches[baseMatches[i]].second->point.x);
-            gsl_matrix_set(A, i*2, 7, -matches[baseMatches[i]].first->point.y * matches[baseMatches[i]].second->point.x);
-            gsl_matrix_set(A, i*2, 8, -matches[baseMatches[i]].second->point.x);
+            gsl_matrix_set(A, i*2, 6, -xExpect*xInit);
+            gsl_matrix_set(A, i*2, 7, -xExpect*yInit);
+            gsl_matrix_set(A, i*2, 8, -xExpect);
 
-            gsl_matrix_set(A, i*2 + 1, 3, matches[baseMatches[i]].first->point.x);
-            gsl_matrix_set(A, i*2 + 1, 4, matches[baseMatches[i]].first->point.y);
+            gsl_matrix_set(A, i*2 + 1, 3, xInit);
+            gsl_matrix_set(A, i*2 + 1, 4, yInit);
             gsl_matrix_set(A, i*2 + 1, 5, 1);
 
-            gsl_matrix_set(A, i*2 + 1, 6, -matches[baseMatches[i]].first->point.x * matches[baseMatches[i]].second->point.y);
-            gsl_matrix_set(A, i*2 + 1, 7, -matches[baseMatches[i]].first->point.y * matches[baseMatches[i]].second->point.y);
-            gsl_matrix_set(A, i*2 + 1, 8, -matches[baseMatches[i]].second->point.y);
+            gsl_matrix_set(A, i*2 + 1, 6, -yExpect*xInit);
+            gsl_matrix_set(A, i*2 + 1, 7, -yExpect*yInit);
+            gsl_matrix_set(A, i*2 + 1, 8, -yExpect);
         }
 
         gsl_matrix_transpose_memcpy(AT, A);
@@ -117,7 +127,7 @@ void Models::RanSaC(int iterCount, float eps)
             yExpect = matches[i].second->point.y;
 
             xCur = (h[0]*xInit + h[1]*yInit + h[2]) / (h[6]*xInit + h[7]*yInit + h[8]);
-            xCur = (h[3]*xInit + h[4]*yInit + h[5]) / (h[6]*xInit + h[7]*yInit + h[8]);
+            yCur = (h[3]*xInit + h[4]*yInit + h[5]) / (h[6]*xInit + h[7]*yInit + h[8]);
 
             if(sqrt(pow(xExpect - xCur,2)+pow(yExpect - yCur,2)) < eps)
             {
@@ -130,6 +140,17 @@ void Models::RanSaC(int iterCount, float eps)
             {
                 bestModel[i] = h[i];
             }
+
+            for(int i=0; i<4; i++)
+            {
+                xInit = matches[baseMatches[i]].first->point.x;
+                yInit = matches[baseMatches[i]].first->point.y;
+
+                xCur = (h[0]*xInit + h[1]*yInit + h[2]) / (h[6]*xInit + h[7]*yInit + h[8]);
+                yCur = (h[3]*xInit + h[4]*yInit + h[5]) / (h[6]*xInit + h[7]*yInit + h[8]);
+                best[i] = make_pair(Point(xInit, yInit, 0, 0), Point(xCur,yCur, 0, 0));
+            }
+            bestInliners = inliners;
         }
         iter++;
     }
@@ -140,12 +161,13 @@ void Models::RanSaC(int iterCount, float eps)
     gsl_matrix_free(V);
     gsl_vector_free(singular);
 
-    qDebug() << bestInliners;
     qDebug() << "Model:";
     for(int i=0; i<9; i++)
     {
          qDebug() << bestModel[i];
     }
+    qDebug() <<"Inliers: " << bestInliners;
+    return bestModel;
 }
 
 Models::~Models()

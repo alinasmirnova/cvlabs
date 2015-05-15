@@ -163,9 +163,8 @@ vector<Point> Pyramid::findLocalMaximaAndMinima() const
     float curValue, value;
     bool isLocalMaxMin;
     int more, less;
-    int borderX, borderY;
     float trace, det;
-
+    int borderX, borderY;
     shared_ptr<Image> dxx, dyy, dxy;
 
     for(uint dog = 1; dog < DoG.size() - 1; dog++)
@@ -189,7 +188,7 @@ vector<Point> Pyramid::findLocalMaximaAndMinima() const
             for(int y = borderY; y < DoG[dog]->getImage()->getHeight()-borderY; y++)
             {                
                 curValue = DoG[dog]->getImage()->getPixel(y, x);
-                if(fabs(curValue) < 6) continue;
+                if(fabs(curValue) < 1) continue;
 
                 isLocalMaxMin = true;
                 more = 0;
@@ -289,6 +288,8 @@ shared_ptr<PyramidLevel> Pyramid::getLevel(int octave, int level) const
 shared_ptr<Descriptor> Pyramid::getDescriptor(Point p, int surSize, int gistNum, int basketNum) const
 {
     auto level = getLevel(p.scale);
+    int x1 = p.x;
+    int y1 = p.y;
 
    //find point angle
    //auto gist = level->getGenerator()->getDescriptor(p1, surSize, 1, 36);
@@ -297,8 +298,8 @@ shared_ptr<Descriptor> Pyramid::getDescriptor(Point p, int surSize, int gistNum,
 
     auto desk = level->getGenerator()->getDescriptor(p, surSize, gistNum, basketNum);
 
-    p.x = p.x * pow(2, level->getOctave());
-    p.y = p.y * pow(2, level->getOctave());
+    p.x = x1;
+    p.y = y1;
     desk->point = p;
     return desk;
 }

@@ -184,7 +184,7 @@ vector<Point> Detectors::AdaptiveNonMaximumSuppression(const vector<Point> &poin
     return result;
 }
 
-vector<Point> Detectors::ScaleInvariant(const Pyramid& pyramid)
+vector<Point> Detectors::ScaleInvariant(const Pyramid& pyramid, int halfWindow)
 {
     vector<Point> result;
 

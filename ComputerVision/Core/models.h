@@ -8,11 +8,12 @@
 class Models
 {
     vector<pair<shared_ptr<Descriptor>, shared_ptr<Descriptor>>> matches;
-
 public:
+    vector<pair<Point, Point>> best;
+
     Models(vector<shared_ptr<Descriptor>> desc1, vector<shared_ptr<Descriptor>> desc2);
 
-    void RanSaC(int iterCount, float eps);
+    float *RanSaC(int iterCount, float eps);
 
     ~Models();
 };
