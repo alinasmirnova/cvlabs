@@ -288,6 +288,8 @@ shared_ptr<PyramidLevel> Pyramid::getLevel(int octave, int level) const
 shared_ptr<Descriptor> Pyramid::getDescriptor(Point p, int surSize, int gistNum, int basketNum) const
 {
     auto level = getLevel(p.scale);
+    int x1 = p.x;
+    int y1 = p.y;
 
    //find point angle
    //auto gist = level->getGenerator()->getDescriptor(p1, surSize, 1, 36);
@@ -296,8 +298,8 @@ shared_ptr<Descriptor> Pyramid::getDescriptor(Point p, int surSize, int gistNum,
 
     auto desk = level->getGenerator()->getDescriptor(p, surSize, gistNum, basketNum);
 
-    p.x = p.x * pow(2, level->getOctave());
-    p.y = p.y * pow(2, level->getOctave());
+    p.x = x1;
+    p.y = y1;
     desk->point = p;
     return desk;
 }

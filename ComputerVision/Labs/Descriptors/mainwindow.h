@@ -36,7 +36,9 @@ private:
                     vector<Point> points1, vector<Point> points2,
                     vector<shared_ptr<Descriptor> > desc1, vector<shared_ptr<Descriptor> > desc2);
 
-    QImage createPanorama(const Image &img1, const Image& img2, float * model);
+    QImage drawBestPoints(const Models &models, const Image &img1, const Image& img2);
+
+    QImage createPanorama(const Image &img1, const Image& img2, float * h);
 
 private slots:
     void chooseFile();
