@@ -61,38 +61,13 @@ QImage MainWindow::findAndDrawPairs(const Image& img1, const Image& img2,
     painter.drawImage(img1.getWidth()+1, 0, img2.toQImage());
 
     for(uint i=0; i<points1.size(); i++) {
-        painter.drawRect(points1[i].x - 1, points1[i].y - 1, 3, 3);
-    //    painter.drawEllipse(QPoint(points1[i].x, points1[i].y), points1[i].scale*sqrt(2)*2, points1[i].scale*sqrt(2)*2);
+        painter.drawRect(points1[i].x - 1, points1[i].y - 1, 3, 3);        
     }
     for(uint i=0; i<points2.size(); i++) {
         painter.drawRect(points2[i].x + img1.getWidth(), points2[i].y -1, 3, 3);
-    //    painter.drawEllipse(QPoint(points2[i].x, points2[i].y), points2[i].scale*8, points2[i].scale*8);
+
     }
 
-//    for(uint i=0; i<desc1.size(); i++) {
-//        painter.translate(desc1[i]->point.x, desc1[i]->point.y);
-//        painter.rotate(-desc1[i]->point.angle);
-
-//        painter.drawRect(-8, -8, 17, 17);
-//        painter.rotate(desc1[i]->point.angle);
-//        painter.translate(-desc1[i]->point.x, -desc1[i]->point.y);
-
-//    }
-
-//    for(uint i=0; i<desc2.size(); i++) {
-//        painter.translate(desc2[i]->point.x + img1.getWidth() + 1, desc2[i]->point.y);
-//        painter.rotate(-desc2[i]->point.angle);
-
-//        painter.drawRect(-8, -8, 17, 17);
-//        painter.rotate(desc2[i]->point.angle);
-//        painter.translate(-desc2[i]->point.x - img1.getWidth() - 1, -desc2[i]->point.y);
-
-//    }
-
-//    for(uint i=0; i<desc2.size(); i++) {
-//        painter.drawRect(points2[i].x + img1.getWidth(), points2[i].y, 3, 3);
-//    //    painter.drawEllipse(QPoint(points2[i].x, points2[i].y), points2[i].scale*8, points2[i].scale*8);
-//    }
 
     shared_ptr<Descriptor> closest;
     int closestNum;
@@ -106,6 +81,9 @@ QImage MainWindow::findAndDrawPairs(const Image& img1, const Image& img2,
             //painter.drawRect(closest->point.x + img1.getWidth(), closest->point.y - 1, 3, 3);
             painter.setPen(QPen(QColor(rand()%255, rand()%255, rand()%255)));
             painter.drawLine(QPoint(desc1[i]->point.x, desc1[i]->point.y), QPoint(closest->point.x + img1.getWidth() + 1, closest->point.y));
+
+            //painter.drawEllipse(QPoint(desc1[i]->point.x, desc1[i]->point.y), (int)round(desc1[i]->point.scale*sqrt(2)), (int)round(desc1[i]->point.scale*sqrt(2)));
+            //painter.drawEllipse(QPoint(closest->point.x + img1.getWidth() + 1, closest->point.y), (int)round(closest->point.scale*sqrt(2)), (int)round(closest->point.scale*sqrt(2)));
         }
     }
     painter.end();
@@ -166,6 +144,10 @@ QImage MainWindow::createPanorama(const Image &img1, const Image& img2, float *h
         }
     }
 
+//    QTransform t(h[4], h[1], h[7], h[3], h[0], h[6], h[5], h[2]);
+//    painter.setTransform(t);
+//    painter.drawImage(delta,delta,img2.toQImage());
+
     painter.end();
     return result;
 }
@@ -188,8 +170,8 @@ vector<shared_ptr<Descriptor>> MainWindow::findScaledDescriptors(vector<Point> p
 
 void MainWindow::findPoints()
 {
-    img2 = Image::fromFile("E:/Pictures/examples/11.png");
-    //img2 = Image::fromFile("E:/Pictures/examples/rotated.png");
+    //img2 = Image::fromFile("E:/Pictures/examples/111.png");
+    img2 = Image::fromFile("E:/Pictures/examples/rotated.png");
     //img2 = Image::fromFile("E:/Pictures/examples/scaled.png");
     //img2 = Image::fromFile("E:/Pictures/examples/affin.png");
     //img2  = FilterManager::Filter(*img1, *MaskFactory::Shift(15, Direction::DOWN));
@@ -241,8 +223,8 @@ void MainWindow::findPoints()
 
     qDebug()<<"Ransac";
     auto models = make_shared<Models>(desc2, desc1);
-//    auto model = models->Hough(4);
-    auto model = models->RanSaC(1500, 1);
+    auto model = models->Hough(0.008 * max(img1->getHeight(), img2->getWidth()));
+//    auto model = models->RanSaC(1500, 0.008 * max(img1->getHeight(), img2->getWidth()));
     auto image = createPanorama(*img1, *img2, model);
 
     QString savePath = curFolder.absolutePath() + "/descriptors/panorama.png";

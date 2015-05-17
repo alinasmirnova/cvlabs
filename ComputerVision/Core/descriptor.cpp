@@ -1,17 +1,17 @@
 #include "descriptor.h"
 
-Descriptor::Descriptor(int beansNum, Point p): beansNum(beansNum), point(p)
+Descriptor::Descriptor(int binsNum, Point p): binsNum(binsNum), point(p)
 {
-    beans = make_unique<float[]>(beansNum);
+    bins = make_unique<float[]>(binsNum);
 }
 
 float Descriptor::distance(const Descriptor& d1, const Descriptor& d2)
 {
     float distance = 0;
 
-    for(int i=0; i<d1.beansNum; i++)
+    for(int i=0; i<d1.binsNum; i++)
     {
-        distance += pow(d1.beans[i] - d2.beans[i], 2);
+        distance += pow(d1.bins[i] - d2.bins[i], 2);
     }
 
     return sqrt(distance);
@@ -21,57 +21,57 @@ void Descriptor::simpleNormalize()
 {
     float lenght = 0;
 
-    for(int i=0; i<beansNum; i++)
+    for(int i=0; i<binsNum; i++)
     {
-        lenght += pow(beans[i], 2);
+        lenght += pow(bins[i], 2);
     }
 
-    for(int i=0; i<beansNum; i++)
+    for(int i=0; i<binsNum; i++)
     {
-        beans[i] = beans[i] / sqrt(lenght);
+        bins[i] = bins[i] / sqrt(lenght);
     }
 }
 
 void Descriptor::normalize()
 {
     simpleNormalize();
-    for(int i = 0; i<beansNum; i++)
+    for(int i = 0; i<binsNum; i++)
     {
-        beans[i] = min(beans[i], 0.2f);
+        bins[i] = min(bins[i], 0.2f);
     }
     simpleNormalize();
 }
 
-void Descriptor::addInBean(int beanNum, float value)
+void Descriptor::addInBin(int binNum, float value)
 {
-    if(beanNum >= 0 && beanNum < beansNum)
+    if(binNum >= 0 && binNum < binsNum)
     {
-        beans[beanNum] += value;
+        bins[binNum] += value;
     }
 }
 
-void Descriptor::addInGist(int curGistNum, float angle, float weight, int beanInGist)
+void Descriptor::addInHist(int curHistNum, float angle, float weight, int binInHist)
 {
-    float oneBean = 360.0 / beanInGist;
+    float oneBean = 360.0 / binInHist;
     int first = angle/oneBean;
     int second;
 
     if(angle < first*oneBean + 0.5*oneBean)
     {
         second = first - 1;
-        if(second < 0) second += beanInGist;
+        if(second < 0) second += binInHist;
     }
     else
     {
-        second = (first + 1)%beanInGist;
+        second = (first + 1)%binInHist;
     }
 
     float r = fabs(first*oneBean + 0.5*oneBean - angle);
     float firstValue = weight*(oneBean - r)/oneBean;
     float secondValue = weight - firstValue;
 
-    addInBean(curGistNum*beanInGist + first, firstValue);
-    addInBean(curGistNum*beanInGist + second, secondValue);
+    addInBin(curHistNum*binInHist + first, firstValue);
+    addInBin(curHistNum*binInHist + second, secondValue);
 }
 
 int Descriptor::findClosest(vector<shared_ptr<Descriptor>> descriptors)
@@ -101,20 +101,20 @@ int Descriptor::findClosest(vector<shared_ptr<Descriptor>> descriptors)
     return -1;
 }
 
-float Descriptor::getAngle(int bean)
+float Descriptor::getAngle(int bin)
 {
-    float oneBean = 360.0/beansNum;
+    float oneBean = 360.0/binsNum;
 
-    int left = (bean - 1 + beansNum) % beansNum;
-    int right = (bean + 1) % beansNum;
+    int left = (bin - 1 + binsNum) % binsNum;
+    int right = (bin + 1) % binsNum;
 
-    float y2 = beans[bean];
-    float x2 = bean * oneBean + oneBean/2;
+    float y2 = bins[bin];
+    float x2 = bin * oneBean + oneBean/2;
 
-    float y1 = beans[left];
+    float y1 = bins[left];
     float x1 = x2 - oneBean;
 
-    float y3 = beans[right];
+    float y3 = bins[right];
     float x3 = x2 + oneBean;
 
     float a = (y3 - (x3*(y2-y1)+x2*y1-x1*y2)/(x2-x1)) / (x3*(x3-x1-x2) + x1*x2);
@@ -129,19 +129,19 @@ pair<float,float> Descriptor::getMaxAngle()
     int maxIndex1 = -1, maxIndex2 = -1;
     float maxValue1 = numeric_limits<float>::min(), maxValue2 = numeric_limits<float>::min();
 
-    for(int i=0; i<beansNum; i++)
+    for(int i=0; i<binsNum; i++)
     {
-        if(beans[i] > maxValue1)
+        if(bins[i] > maxValue1)
         {
             maxValue2 = maxValue1;
             maxIndex2 = maxIndex1;
 
-            maxValue1 = beans[i];
+            maxValue1 = bins[i];
             maxIndex1 = i;
         }
-        else if(beans[i] > maxValue2)
+        else if(bins[i] > maxValue2)
         {
-            maxValue2 = beans[i];
+            maxValue2 = bins[i];
             maxIndex2 = i;
         }
     }

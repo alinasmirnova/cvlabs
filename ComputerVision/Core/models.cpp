@@ -178,7 +178,7 @@ float *Models::Hough(float eps)
         int xBean, yBean, aBean, sBean;
 
         float dx = 4, dy = 4, dangle = 3.14/8, dscale = 0.25;
-        float shareBean = 3;
+        float shareBean = 2;
 
         //строим четырехмерный аккумулятор
         for(uint i=0; i<matches.size(); i++)
@@ -229,7 +229,7 @@ float *Models::Hough(float eps)
         float h[9];
         int inliers;
         float xInit, yInit, xExpect, yExpect, xCur, yCur;
-        int bestInliers = 0;
+        int bestInliers = -1;
 
 
         gsl_matrix *A = gsl_matrix_alloc(6,6);

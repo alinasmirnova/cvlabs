@@ -10,22 +10,22 @@ using namespace std;
 
 class Descriptor
 {
-    unique_ptr<float[]> beans;
-    int beansNum;
+    unique_ptr<float[]> bins;
+    int binsNum;
 
     void simpleNormalize();
 public:
     Point point;
 
-    Descriptor(int beansNum, Point p);
+    Descriptor(int binsNum, Point p);
 
     static float distance(const Descriptor& d1, const Descriptor& d2);
     void normalize();
-    void addInBean(int beanNum, float value);
-    void addInGist(int curGistNum, float angle, float weight, int beanInGist);
+    void addInBin(int binNum, float value);
+    void addInHist(int curHistNum, float angle, float weight, int binInHist);
 
     pair<float,float> getMaxAngle();
-    float getAngle(int bean);
+    float getAngle(int bin);
 
     int findClosest(vector<shared_ptr<Descriptor> > descriptors);
 

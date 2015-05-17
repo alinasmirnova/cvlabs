@@ -28,58 +28,90 @@ shared_ptr<Pyramid> Pyramid::build(const Image &image, int octaveNum, int levelN
     if(octaveNum > 0 && levelNum > 0)
     {
         shared_ptr<Pyramid> result = make_shared<Pyramid>(octaveNum, levelNum);
-        shared_ptr<Image> next, top1, top2, top3;
+        shared_ptr<Image> next;
 
-        float k = pow(2, 1./(levelNum - 1));
+        float k = pow(2, 1./levelNum);
+        float initSigma = max(sigma0, sigmaInit);
 
-        float curSigma = sigma0 / k;
-        float bottomSigma = sigma0 / k;
-        auto octaveBottom = FilterManager::SeparatedFilter(image, *MaskFactory::GaussSeparated(sqrt(sigma0*sigma0 - sigmaInit*sigmaInit)), false, EdgeMode::MIRROR);
+        auto initial = FilterManager::SeparatedFilter(image, *MaskFactory::GaussSeparated(sqrt(initSigma*initSigma - sigmaInit*sigmaInit)), false, EdgeMode::MIRROR);
+        result->images.push_back(make_shared<PyramidLevel>(initial, 0, -1, initSigma, initSigma));
 
-        //curSigma *= k;
+        initial = FilterManager::SeparatedFilter(image, *MaskFactory::GaussSeparated(sqrt(sigma0*sigma0 - sigmaInit*sigmaInit)), false, EdgeMode::MIRROR);
+        result->images.push_back(make_shared<PyramidLevel>(initial, 0, 0, sigma0, sigma0));
 
-        float innerSigma;
-
-
+        double octaveSigma;
         for(int i=0; i<octaveNum; i++)
         {
-            innerSigma = sigma0;
-            result->images.push_back(make_shared<PyramidLevel>(octaveBottom, i, -1, bottomSigma, innerSigma));
-            //qDebug()<<bottomSigma;
+            octaveSigma = pow(2,i) * sigma0;
 
-            next = octaveBottom;
-            curSigma = bottomSigma;
-
-            for(int j=0; j<levelNum-1; j++)
+            for(int j=2; j < levelNum + 3; j++)
             {
-                next = FilterManager::SeparatedFilter(*next, *MaskFactory::GaussSeparated(curSigma*sqrt(k*k-1)), false, EdgeMode::MIRROR);
-                curSigma *= k;
-                result->images.push_back(make_shared<PyramidLevel>(next, i, j, curSigma, innerSigma));
-                //qDebug() << curSigma;
-                innerSigma *= k;
+                next = FilterManager::SeparatedFilter(*initial, *MaskFactory::GaussSeparated(sqrt( sigma0 * pow(k,j - 1) * sigma0 * pow(k,j - 1) - sigma0 * pow(k, j - 2) * sigma0 * pow(k, j - 2))), false, EdgeMode::MIRROR);
+                initial = next;
+
+                result->images.push_back(make_shared<PyramidLevel>(next, i, j - 1, octaveSigma * pow(k,j - 1), sigma0* pow(k,j - 1)));
             }
 
-            octaveBottom = next->compress(2);
-            bottomSigma = curSigma;
+            if( i != (octaveNum -1))
+            {
+                initial = result->images[i * (levelNum +3) + levelNum]->getImage()->compress(2);
+                result->images.push_back(make_shared<PyramidLevel>(initial, i + 1, -1, octaveSigma * 2 / k, sigma0 / k));
 
-            top1 = FilterManager::SeparatedFilter(*next, *MaskFactory::GaussSeparated(curSigma*sqrt(k*k-1)), false, EdgeMode::MIRROR);
-            curSigma *= k;
-            result->images.push_back(make_shared<PyramidLevel>(top1, i, levelNum-1, curSigma, innerSigma));
-            //qDebug() << curSigma;
-            innerSigma *= k;
-
-            top2 = FilterManager::SeparatedFilter(*top1, *MaskFactory::GaussSeparated(curSigma*sqrt(k*k-1)), false, EdgeMode::MIRROR);
-            curSigma *= k;
-            result->images.push_back(make_shared<PyramidLevel>(top2, i, levelNum, curSigma, innerSigma));
-            //qDebug() << curSigma;
-            innerSigma *= k;
-
-            top3 = FilterManager::SeparatedFilter(*top2, *MaskFactory::GaussSeparated(curSigma*sqrt(k*k-1)), false, EdgeMode::MIRROR);
-            curSigma *= k;
-            result->images.push_back(make_shared<PyramidLevel>(top3, i, levelNum + 1, curSigma, innerSigma));
-            //qDebug() << curSigma;
-            innerSigma *= k;
+                initial = result->images[i * (levelNum +3) + levelNum + 1]->getImage()->compress(2);
+                result->images.push_back(make_shared<PyramidLevel>(initial, i + 1, 0, octaveSigma * 2, sigma0));
+            }
         }
+
+//        float k = pow(2, 1./(levelNum - 1));
+
+//        float curSigma = sigma0 / k;
+//        float bottomSigma = sigma0 / k;
+//        auto octaveBottom = FilterManager::SeparatedFilter(image, *MaskFactory::GaussSeparated(sqrt(bottomSigma*bottomSigma - sigmaInit*sigmaInit)), false, EdgeMode::MIRROR);
+
+//        //curSigma *= k;
+
+//        float innerSigma;
+
+
+//        for(int i=0; i<octaveNum; i++)
+//        {
+//            innerSigma = sigma0 / k;
+//            result->images.push_back(make_shared<PyramidLevel>(octaveBottom, i, -1, bottomSigma, innerSigma));
+//            //qDebug()<<bottomSigma;
+//            innerSigma *= k;
+//            next = octaveBottom;
+//            curSigma = bottomSigma;
+
+//            for(int j=0; j<levelNum-1; j++)
+//            {
+//                next = FilterManager::SeparatedFilter(*next, *MaskFactory::GaussSeparated(sqrt(pow(curSigma*k, 2) - pow(curSigma, 2))), false, EdgeMode::MIRROR);
+//                curSigma *= k;
+//                result->images.push_back(make_shared<PyramidLevel>(next, i, j, curSigma, innerSigma));
+//                //qDebug() << curSigma;
+//                innerSigma *= k;
+//            }
+
+//            octaveBottom = next->compress(2);
+//            bottomSigma = curSigma;
+
+//            top1 = FilterManager::SeparatedFilter(*next, *MaskFactory::GaussSeparated(sqrt(pow(curSigma*k, 2) - pow(curSigma, 2))), false, EdgeMode::MIRROR);
+//            curSigma *= k;
+//            result->images.push_back(make_shared<PyramidLevel>(top1, i, levelNum-1, curSigma, innerSigma));
+//            //qDebug() << curSigma;
+//            innerSigma *= k;
+
+//            top2 = FilterManager::SeparatedFilter(*top1, *MaskFactory::GaussSeparated(sqrt(pow(curSigma*k, 2) - pow(curSigma, 2))), false, EdgeMode::MIRROR);
+//            curSigma *= k;
+//            result->images.push_back(make_shared<PyramidLevel>(top2, i, levelNum, curSigma, innerSigma));
+//            //qDebug() << curSigma;
+//            innerSigma *= k;
+
+//            top3 = FilterManager::SeparatedFilter(*top2, *MaskFactory::GaussSeparated(sqrt(pow(curSigma*k, 2) - pow(curSigma, 2))), false, EdgeMode::MIRROR);
+//            curSigma *= k;
+//            result->images.push_back(make_shared<PyramidLevel>(top3, i, levelNum + 1, curSigma, innerSigma));
+//            //qDebug() << curSigma;
+//            innerSigma *= k;
+//        }
 
         shared_ptr<Image> DoG;
         shared_ptr<Image> top, bottom;
