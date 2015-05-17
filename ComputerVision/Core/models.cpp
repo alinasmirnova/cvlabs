@@ -39,10 +39,10 @@ float* Models::RanSaC(int iterCount, float eps)
     gsl_matrix_set_zero(A);
 
     float h[9];
-    int inliners;
+    int inliers;
     float xInit, yInit, xExpect, yExpect, xCur, yCur;
     float lastH;
-    int bestInliners = 0;
+    int bestInliers = 0;
 
     while(iter < iterCount)
     {
@@ -115,7 +115,7 @@ float* Models::RanSaC(int iterCount, float eps)
 
         //find inliners count
 
-        inliners = 0;
+        inliers = 0;
 
         for(uint i=0; i<matches.size(); i++)
         {
@@ -130,10 +130,10 @@ float* Models::RanSaC(int iterCount, float eps)
 
             if(sqrt(pow(xExpect - xCur,2)+pow(yExpect - yCur,2)) < eps)
             {
-                inliners++;
+                inliers++;
             }
         }
-        if(inliners > bestInliners)
+        if(inliers > bestInliers)
         {
             for(int i=0; i<9; i++)
             {
@@ -149,7 +149,7 @@ float* Models::RanSaC(int iterCount, float eps)
                 yCur = (h[3]*xInit + h[4]*yInit + h[5]) / (h[6]*xInit + h[7]*yInit + h[8]);
                 best[i] = make_pair(Point(xInit, yInit, 0, 0), Point(xCur,yCur, 0, 0));
             }
-            bestInliners = inliners;
+            bestInliers = inliers;
         }
         iter++;
     }
@@ -165,7 +165,7 @@ float* Models::RanSaC(int iterCount, float eps)
     {
          qDebug() << bestModel[i];
     }
-    qDebug() <<"Inliers: " << bestInliners;
+    qDebug() <<"Inliers: " << bestInliers;
     return bestModel;
 }
 
@@ -227,10 +227,9 @@ float *Models::Hough(float eps)
         }
 
         float h[9];
-        int inliners;
+        int inliers;
         float xInit, yInit, xExpect, yExpect, xCur, yCur;
-        float lastH;
-        int bestInliners = 0;
+        int bestInliers = 0;
 
 
         gsl_matrix *A = gsl_matrix_alloc(6,6);
@@ -276,7 +275,7 @@ float *Models::Hough(float eps)
                 h[8] = 1;
                 //find inliners count
 
-                inliners = 0;
+                inliers = 0;
 
                 for(uint i=0; i<matches.size(); i++)
                 {
@@ -291,17 +290,17 @@ float *Models::Hough(float eps)
 
                     if(sqrt(pow(xExpect - xCur,2)+pow(yExpect - yCur,2)) < eps)
                     {
-                        inliners++;
+                        inliers++;
                     }
                 }
-                if(inliners > bestInliners)
+                if(inliers > bestInliers)
                 {
                     for(int i=0; i<9; i++)
                     {
                         bestModel[i] = h[i];
                     }
 
-                    bestInliners = inliners;
+                    bestInliers = inliers;
                 }
             }
         }
@@ -316,7 +315,7 @@ float *Models::Hough(float eps)
         {
              qDebug() << bestModel[i];
         }
-        qDebug() <<"Inliers: " << bestInliners;
+        qDebug() <<"Inliers: " << bestInliers;
         return bestModel;
 }
 
