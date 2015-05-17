@@ -34,7 +34,8 @@ HEADERS += image.h \
     descriptorgenerator.h \
     descriptor.h \
     point.h \
-    models.h
+    models.h \
+    modelparameter.h
 unix {
     target.path = /usr/lib
     INSTALLS += target

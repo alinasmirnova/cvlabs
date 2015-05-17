@@ -160,8 +160,8 @@ QImage MainWindow::createPanorama(const Image &img1, const Image& img2, float *h
 
             if(xCur >= 0 && xCur <1000 && yCur >= 0 && yCur <1000)
             {
-                result.setPixel(xCur, yCur, qRgb(img2.getPixel(j, i),img2.getPixel(j, i),img2.getPixel(j, i)));
-                //result.setPixel(xCur, yCur, img2.getPixel(j, i));
+                //result.setPixel(xCur, yCur, qRgb(img2.getPixel(j, i),img2.getPixel(j, i),img2.getPixel(j, i)));
+                result.setPixel(xCur, yCur, img2.getPixel(j, i));
             }
         }
     }
@@ -188,8 +188,8 @@ vector<shared_ptr<Descriptor>> MainWindow::findScaledDescriptors(vector<Point> p
 
 void MainWindow::findPoints()
 {
-    //img2 = Image::fromFile("E:/Pictures/examples/111.png");
-    img2 = Image::fromFile("E:/Pictures/examples/04.png");
+    img2 = Image::fromFile("E:/Pictures/examples/111.png");
+    //img2 = Image::fromFile("E:/Pictures/examples/rotated.png");
     //img2 = Image::fromFile("E:/Pictures/examples/scaled.png");
     //img2 = Image::fromFile("E:/Pictures/examples/affin.png");
     //img2  = FilterManager::Filter(*img1, *MaskFactory::Shift(15, Direction::DOWN));
@@ -232,25 +232,25 @@ void MainWindow::findPoints()
     qDebug()<<"Second descriptors";
     auto desc2 = findScaledDescriptors(points2, *pyramid2);
 
-//    qDebug()<<"Drawing";
+    qDebug()<<"Drawing";
 
-//    auto result = findAndDrawPairs(*img1, *img2, points1, points2, desc1, desc2);
+    auto result = findAndDrawPairs(*img1, *img2, points1, points2, desc1, desc2);
 
-//    auto result = findAndDrawPairs(*img1, *img2, points1, points2, desc1, desc2);
+    QString savePath = curFolder.absolutePath() + "/descriptors/11.png";
+    result.save(savePath);
 
-//    QString savePath = curFolder.absolutePath() + "/descriptors/11.png";
-//    result.save(savePath);
+//    qDebug()<<"Ransac";
+//    auto models = make_shared<Models>(desc2, desc1);
+//    auto model = models->Hough(4);
+////    auto model = models->RanSaC(1500, 1);
+//    auto image = createPanorama(*img1, *img2, model);
 
-    qDebug()<<"Ransac";
-    auto models = make_shared<Models>(desc2, desc1);
-    auto model = models->RanSaC(1500, 1);
-    auto image = createPanorama(*img1, *img2, model);
-    QString savePath = curFolder.absolutePath() + "/descriptors/panorama.png";
-    image.save(savePath);
+//    QString savePath = curFolder.absolutePath() + "/descriptors/panorama.png";
+//    image.save(savePath);
 
-    auto result1 =drawBestPoints(*models, *img2, *img1);
-    savePath = curFolder.absolutePath() + "/descriptors/best.png";
-    result1.save(savePath);
+//    auto result1 =drawBestPoints(*models, *img2, *img1);
+//    savePath = curFolder.absolutePath() + "/descriptors/best.png";
+//    result1.save(savePath);
 }
 
 MainWindow::~MainWindow()
