@@ -38,7 +38,8 @@ private:
 
     QImage drawBestPoints(const Models &models, const Image &img1, const Image& img2);
 
-    QImage createPanorama(const Image &img1, const Image& img2, float * h);
+    QImage createPanorama(const Image &img1, const Image& img2, double * h);
+    QImage drawObject(const Image &img1, const Image& img2, double *h);
 
 private slots:
     void chooseFile();

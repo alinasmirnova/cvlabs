@@ -16,7 +16,7 @@ Models::Models(vector<shared_ptr<Descriptor> > desc1, vector<shared_ptr<Descript
     qDebug() << matches.size();
 }
 
-float* Models::RanSaC(int iterCount, float eps)
+double *Models::RanSaC(int iterCount, float eps)
 {
     if(matches.size() < 4 || iterCount == 0) return NULL;
 
@@ -38,10 +38,10 @@ float* Models::RanSaC(int iterCount, float eps)
 
     gsl_matrix_set_zero(A);
 
-    float h[9];
+    double h[9];
     int inliers;
-    float xInit, yInit, xExpect, yExpect, xCur, yCur;
-    float lastH;
+    double xInit, yInit, xExpect, yExpect, xCur, yCur;
+    double lastH;
     int bestInliers = 0;
 
     while(iter < iterCount)
@@ -169,16 +169,16 @@ float* Models::RanSaC(int iterCount, float eps)
     return bestModel;
 }
 
-float *Models::Hough(float eps)
+double *Models::Hough(float eps)
 {
     //дескрипторы искомого объекта - первые в паре
         map<ModelParameter, vector<int>> votes;
-        float x, y, angle, scale;
+        double x, y, angle, scale;
         Point point1, point2;
-        int xBean, yBean, aBean, sBean;
+        int xBin, yBin, aBin, sBin;
 
-        float dx = 4, dy = 4, dangle = 3.14/8, dscale = 0.25;
-        float shareBean = 2;
+        double dx = 2, dy = 2, dangle = 3.14/7.5, dscale = 0.25;
+        int shareBin = 3;
 
         //строим четырехмерный аккумулятор
         for(uint i=0; i<matches.size(); i++)
@@ -198,20 +198,20 @@ float *Models::Hough(float eps)
            x = point2.x - x*scale;
            y = point2.y - y*scale;
 
-           xBean = round(x / dx);
-           yBean = round(y / dy);
-           aBean = round(angle / dangle);
-           sBean = round(scale / dscale);
+           xBin = round(x / dx);
+           yBin = round(y / dy);
+           aBin = round(angle / dangle);
+           sBin = round(scale / dscale);
 
-           for(int sx = -shareBean; sx <=shareBean; sx++)
+           for(int sx = -shareBin; sx <=shareBin; sx++)
            {
-               for(int sy = -shareBean; sy <=shareBean; sy++)
+               for(int sy = -shareBin; sy <=shareBin; sy++)
                {
-                   for(int sa = -shareBean; sa <=shareBean; sa++)
+                   for(int sa = -shareBin; sa <=shareBin; sa++)
                    {
-                       for(int ss = -shareBean; ss <=shareBean; ss++)
+                       for(int ss = -shareBin; ss <=shareBin; ss++)
                        {
-                           auto model = ModelParameter(xBean + sx, yBean + sy, sBean + ss, aBean + sa);
+                           auto model = ModelParameter(xBin + sx, yBin + sy, sBin + ss, aBin + sa);
                            if(votes.find(model) == votes.end())
                            {
                                votes[model] = vector<int>();
@@ -226,9 +226,9 @@ float *Models::Hough(float eps)
            }
         }
 
-        float h[9];
+        double h[9];
         int inliers;
-        float xInit, yInit, xExpect, yExpect, xCur, yCur;
+        double xInit, yInit, xExpect, yExpect, xCur, yCur;
         int bestInliers = -1;
 
 

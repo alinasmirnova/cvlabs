@@ -116,7 +116,7 @@ QImage MainWindow::drawBestPoints(const Models &models, const Image &img1, const
     return result;
 }
 
-QImage MainWindow::createPanorama(const Image &img1, const Image& img2, float *h)
+QImage MainWindow::createPanorama(const Image &img1, const Image& img2, double *h)
 {
     QImage result = QImage(1500,1500, QImage::Format_RGB32);
     result.fill(0);
@@ -138,7 +138,7 @@ QImage MainWindow::createPanorama(const Image &img1, const Image& img2, float *h
 
             if(xCur >= 0 && xCur <1000 && yCur >= 0 && yCur <1000)
             {
-                //result.setPixel(xCur, yCur, qRgb(img2.getPixel(j, i),img2.getPixel(j, i),img2.getPixel(j, i)));
+                result.setPixel(xCur, yCur, qRgb(img2.getPixel(j, i),img2.getPixel(j, i),img2.getPixel(j, i)));
                 result.setPixel(xCur, yCur, img2.getPixel(j, i));
             }
         }
@@ -148,6 +148,55 @@ QImage MainWindow::createPanorama(const Image &img1, const Image& img2, float *h
 //    painter.setTransform(t);
 //    painter.drawImage(delta,delta,img2.toQImage());
 
+    painter.end();
+    return result;
+}
+
+QImage MainWindow::drawObject(const Image &img1, const Image& img2, double * h)
+{
+    QImage result = QImage(img1.getWidth(), img1.getHeight(), QImage::Format_RGB32);
+    result.fill(0);
+    QPainter painter(&result);
+
+    painter.drawImage(0,0,img1.toQImage());
+//    auto rect = img2.toQImage().rect();
+
+//    int xInit, yInit, xCur, yCur;
+//    for(int i=0; i<img2.getWidth(); i++)
+//    {
+//        for(int j=0; j<img2.getHeight(); j++)
+//        {
+//            xInit = i;
+//            yInit = j;
+
+//            xCur = round((h[0]*xInit + h[1]*yInit + h[2]) / (h[6]*xInit + h[7]*yInit + h[8]));
+//            yCur = round((h[3]*xInit + h[4]*yInit + h[5]) / (h[6]*xInit + h[7]*yInit + h[8]));
+
+//            if(xCur >= 0 && xCur <1000 && yCur >= 0 && yCur <1000)
+//            {
+//                //result.setPixel(xCur, yCur, qRgb(img2.getPixel(j, i),img2.getPixel(j, i),img2.getPixel(j, i)));
+//                result.setPixel(xCur, yCur, img2.getPixel(j, i));
+//            }
+//        }
+//    }
+
+    painter.setPen(QPen(QColor(Qt::red)));
+    QPointF lines[5];
+
+    lines[0] = QPointF(h[2], h[5]);
+    lines[1] = QPointF(h[0]*(img2.getWidth() - 1) + h[2], h[3]*(img2.getWidth() - 1) + h[5]);
+    lines[2] = QPointF(h[0]*(img2.getWidth() - 1) + h[1]*(img2.getHeight() - 1) + h[2],h[3]*(img2.getWidth() - 1) + h[4]*(img2.getHeight() - 1) + h[5]);
+    lines[3] = QPointF(h[1]*(img2.getHeight() - 1) + h[2], h[4]*(img2.getHeight() - 1) + h[5]);
+    lines[4] = QPointF(h[2], h[5]);
+    painter.drawPolyline(lines, 5);
+
+
+//    QTransform t = QTransform(h[4], h[3], h[1], h[0], h[2], h[5]);
+//    painter.setTransform(t);
+//    //painter.drawImage(delta,delta,img2.toQImage());
+//    painter.setPen(QPen(QColor(Qt::red)));
+//    painter.drawRect(rect);
+//    painter.drawImage(0,0,img2.toQImage());
     painter.end();
     return result;
 }
@@ -224,8 +273,9 @@ void MainWindow::findPoints()
     qDebug()<<"Ransac";
     auto models = make_shared<Models>(desc2, desc1);
     auto model = models->Hough(0.008 * max(img1->getHeight(), img2->getWidth()));
+    auto image = drawObject(*img1, *img2, model);
 //    auto model = models->RanSaC(1500, 0.008 * max(img1->getHeight(), img2->getWidth()));
-    auto image = createPanorama(*img1, *img2, model);
+    //auto image = createPanorama(*img1, *img2, model);
 
     QString savePath = curFolder.absolutePath() + "/descriptors/panorama.png";
     image.save(savePath);

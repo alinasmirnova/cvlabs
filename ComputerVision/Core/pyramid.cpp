@@ -220,7 +220,7 @@ vector<Point> Pyramid::findLocalMaximaAndMinima() const
             for(int y = borderY; y < DoG[dog]->getImage()->getHeight()-borderY; y++)
             {                
                 curValue = DoG[dog]->getImage()->getPixel(y, x);
-                if(fabs(curValue) < 1) continue;
+                if(fabs(curValue) < 2) continue;
 
                 isLocalMaxMin = true;
                 more = 0;
