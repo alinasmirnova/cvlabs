@@ -4,12 +4,12 @@
 
 struct ModelParameter
 {
-    float x;
-    float y;
-    float scale;
-    float angle;
+    int x;
+    int y;
+    int scale;
+    int angle;
 public:
-    ModelParameter(float x, float y, float scale, float angle) : x(x), y(y), scale(scale), angle(angle){}
+    ModelParameter(int x, int y, int scale, int angle) : x(x), y(y), scale(scale), angle(angle){}
     ~ModelParameter(){}
 
     bool operator< (const ModelParameter &p) const {

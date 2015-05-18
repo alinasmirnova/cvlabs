@@ -194,8 +194,6 @@ double *Models::Hough()
            scale = point2.scale / point1.scale;
 
            angle = (point2.angle - point1.angle)*3.14/180;
-           //while(angle < 0) angle += 2*3.14;
-           //while(angle > 2*3.14) angle -= 2*3.14;
 
            x = point1.x * cos(angle) - point1.y * sin(angle);
            y = point1.x * sin(angle) + point1.y * cos(angle);
