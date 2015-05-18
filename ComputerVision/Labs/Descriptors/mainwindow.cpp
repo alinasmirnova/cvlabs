@@ -159,27 +159,6 @@ QImage MainWindow::drawObject(const Image &img1, const Image& img2, double * h)
     QPainter painter(&result);
 
     painter.drawImage(0,0,img1.toQImage());
-//    auto rect = img2.toQImage().rect();
-
-//    int xInit, yInit, xCur, yCur;
-//    for(int i=0; i<img2.getWidth(); i++)
-//    {
-//        for(int j=0; j<img2.getHeight(); j++)
-//        {
-//            xInit = i;
-//            yInit = j;
-
-//            xCur = round((h[0]*xInit + h[1]*yInit + h[2]) / (h[6]*xInit + h[7]*yInit + h[8]));
-//            yCur = round((h[3]*xInit + h[4]*yInit + h[5]) / (h[6]*xInit + h[7]*yInit + h[8]));
-
-//            if(xCur >= 0 && xCur <1000 && yCur >= 0 && yCur <1000)
-//            {
-//                //result.setPixel(xCur, yCur, qRgb(img2.getPixel(j, i),img2.getPixel(j, i),img2.getPixel(j, i)));
-//                result.setPixel(xCur, yCur, img2.getPixel(j, i));
-//            }
-//        }
-//    }
-
     painter.setPen(QPen(QColor(Qt::red)));
     QPointF lines[5];
 
@@ -219,8 +198,8 @@ vector<shared_ptr<Descriptor>> MainWindow::findScaledDescriptors(vector<Point> p
 
 void MainWindow::findPoints()
 {
-    //img2 = Image::fromFile("E:/Pictures/examples/111.png");
-    img2 = Image::fromFile("E:/Pictures/examples/rotated.png");
+    img2 = Image::fromFile("E:/Pictures/examples/111.png");
+    //img2 = Image::fromFile("E:/Pictures/examples/rotated.png");
     //img2 = Image::fromFile("E:/Pictures/examples/scaled.png");
     //img2 = Image::fromFile("E:/Pictures/examples/affin.png");
     //img2  = FilterManager::Filter(*img1, *MaskFactory::Shift(15, Direction::DOWN));
@@ -272,17 +251,17 @@ void MainWindow::findPoints()
 
     qDebug()<<"Ransac";
     auto models = make_shared<Models>(desc2, desc1);
-    auto model = models->Hough(0.008 * max(img1->getHeight(), img2->getWidth()));
+    auto model = models->Hough(0.015 * max(img1->getHeight(), img2->getWidth()));
     auto image = drawObject(*img1, *img2, model);
 //    auto model = models->RanSaC(1500, 0.008 * max(img1->getHeight(), img2->getWidth()));
-    //auto image = createPanorama(*img1, *img2, model);
+//    auto image = createPanorama(*img1, *img2, model);
 
     QString savePath = curFolder.absolutePath() + "/descriptors/panorama.png";
     image.save(savePath);
 
-    auto result1 =drawBestPoints(*models, *img2, *img1);
-    savePath = curFolder.absolutePath() + "/descriptors/best.png";
-    result1.save(savePath);
+//    auto result1 =drawBestPoints(*models, *img2, *img1);
+//    savePath = curFolder.absolutePath() + "/descriptors/best.png";
+//    result1.save(savePath);
 }
 
 MainWindow::~MainWindow()

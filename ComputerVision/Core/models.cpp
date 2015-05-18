@@ -177,8 +177,13 @@ double *Models::Hough(float eps)
         Point point1, point2;
         int xBin, yBin, aBin, sBin;
 
-        double dx = 2, dy = 2, dangle = 3.14/7.5, dscale = 0.25;
-        int shareBin = 3;
+        //Lenna
+//        double dx = 2, dy = 2, dangle = 3.14/7.5, dscale = 0.25;
+//        int shareBin = 3;
+
+        //Box
+        double dx = 1, dy = 1, dangle = 3.14/16, dscale = 0.25;
+        int shareBin = 2;
 
         //строим четырехмерный аккумулятор
         for(uint i=0; i<matches.size(); i++)
@@ -237,6 +242,7 @@ double *Models::Hough(float eps)
         gsl_vector *solution = gsl_vector_alloc(6);
         gsl_permutation * p = gsl_permutation_alloc (6);
         int signum;
+        int best;
 
         for(auto vote = votes.begin(); vote != votes.end(); vote++)
         {
