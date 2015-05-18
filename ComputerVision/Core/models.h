@@ -17,7 +17,7 @@ public:
 
     double *RanSaC(int iterCount, float eps);
 
-    double *Hough(float eps);
+    double *Hough();
     ~Models();
 };
 

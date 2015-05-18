@@ -251,7 +251,7 @@ void MainWindow::findPoints()
 
     qDebug()<<"Ransac";
     auto models = make_shared<Models>(desc2, desc1);
-    auto model = models->Hough(0.015 * max(img1->getHeight(), img2->getWidth()));
+    auto model = models->Hough();
     auto image = drawObject(*img1, *img2, model);
 //    auto model = models->RanSaC(1500, 0.008 * max(img1->getHeight(), img2->getWidth()));
 //    auto image = createPanorama(*img1, *img2, model);

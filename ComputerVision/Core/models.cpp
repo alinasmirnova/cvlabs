@@ -169,7 +169,7 @@ double *Models::RanSaC(int iterCount, float eps)
     return bestModel;
 }
 
-double *Models::Hough(float eps)
+double *Models::Hough()
 {
     //дескрипторы искомого объекта - первые в паре
         map<ModelParameter, vector<int>> votes;
@@ -231,10 +231,7 @@ double *Models::Hough(float eps)
            }
         }
 
-        double h[9];
-        int inliers;
-        double xInit, yInit, xExpect, yExpect, xCur, yCur;
-        int bestInliers = -1;
+        double xInit, yInit, xExpect, yExpect;
 
 
         gsl_matrix *A = gsl_matrix_alloc(6,6);
@@ -242,86 +239,51 @@ double *Models::Hough(float eps)
         gsl_vector *solution = gsl_vector_alloc(6);
         gsl_permutation * p = gsl_permutation_alloc (6);
         int signum;
-        int best;
+        int bestCount = 0;
+        map<ModelParameter , vector<int>>::iterator best;
 
         for(auto vote = votes.begin(); vote != votes.end(); vote++)
         {
-            if(vote->second.size() > 2)
+            if((int)vote->second.size() > bestCount)
             {
-                //qDebug() << vote->second.size();
-                for(int i=0; i<3; i++)
-                {
-                    xInit = matches[vote->second[i]].first->point.x;
-                    yInit = matches[vote->second[i]].first->point.y;
-
-                    xExpect = matches[vote->second[i]].second->point.x;
-                    yExpect = matches[vote->second[i]].second->point.y;
-
-                    gsl_matrix_set(A, i*2, 0, xInit);
-                    gsl_matrix_set(A, i*2, 1, yInit);
-                    gsl_matrix_set(A, i*2, 2, 1);
-
-                    gsl_matrix_set(A, i*2 + 1, 3, xInit);
-                    gsl_matrix_set(A, i*2 + 1, 4, yInit);
-                    gsl_matrix_set(A, i*2 + 1, 5, 1);
-
-                    gsl_vector_set(b, i*2, xExpect);
-                    gsl_vector_set(b, i*2 + 1, yExpect);
-                }
-
-                gsl_linalg_LU_decomp (A, p, &signum);
-                gsl_linalg_LU_solve (A, p, b, solution);
-
-                for(int i=0; i<6; i++)
-                {
-                    h[i] = gsl_vector_get(solution, i);
-                }
-                h[6] = 0;
-                h[7] = 0;
-                h[8] = 1;
-                //find inliners count
-
-                inliers = 0;
-
-                for(uint i=0; i<matches.size(); i++)
-                {
-                    xInit = matches[i].first->point.x;
-                    yInit = matches[i].first->point.y;
-
-                    xExpect = matches[i].second->point.x;
-                    yExpect = matches[i].second->point.y;
-
-                    xCur = (h[0]*xInit + h[1]*yInit + h[2]) / (h[6]*xInit + h[7]*yInit + h[8]);
-                    yCur = (h[3]*xInit + h[4]*yInit + h[5]) / (h[6]*xInit + h[7]*yInit + h[8]);
-
-                    if(sqrt(pow(xExpect - xCur,2)+pow(yExpect - yCur,2)) < eps)
-                    {
-                        inliers++;
-                    }
-                }
-                if(inliers > bestInliers)
-                {
-                    for(int i=0; i<9; i++)
-                    {
-                        bestModel[i] = h[i];
-                    }
-
-                    bestInliers = inliers;
-                }
+                bestCount = vote->second.size();
+                best = vote;
             }
         }
-        gsl_matrix_free(A);
-        gsl_vector_free(b);
-        gsl_vector_free(solution);
-        gsl_permutation_free(p);
 
-
-        qDebug() << "Model:";
-        for(int i=0; i<9; i++)
+        if(bestCount > 2)
         {
-             qDebug() << bestModel[i];
+            for(int i=0; i<3; i++)
+            {
+                xInit = matches[best->second[i]].first->point.x;
+                yInit = matches[best->second[i]].first->point.y;
+
+                xExpect = matches[best->second[i]].second->point.x;
+                yExpect = matches[best->second[i]].second->point.y;
+
+                gsl_matrix_set(A, i*2, 0, xInit);
+                gsl_matrix_set(A, i*2, 1, yInit);
+                gsl_matrix_set(A, i*2, 2, 1);
+
+                gsl_matrix_set(A, i*2 + 1, 3, xInit);
+                gsl_matrix_set(A, i*2 + 1, 4, yInit);
+                gsl_matrix_set(A, i*2 + 1, 5, 1);
+
+                gsl_vector_set(b, i*2, xExpect);
+                gsl_vector_set(b, i*2 + 1, yExpect);
+            }
+
+            gsl_linalg_LU_decomp (A, p, &signum);
+            gsl_linalg_LU_solve (A, p, b, solution);
+
+            for(int i=0; i<6; i++)
+            {
+                bestModel[i] = gsl_vector_get(solution, i);
+            }
+            bestModel[6] = 0;
+            bestModel[7] = 0;
+            bestModel[8] = 1;
         }
-        qDebug() <<"Inliers: " << bestInliers;
         return bestModel;
 }
 
